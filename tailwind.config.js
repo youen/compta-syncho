@@ -8,10 +8,14 @@ export default {
     extend: {
       colors: {
         primary: '#ea3a60',
-        secondary: '#2d3436',
+        primaryDark: '#ea0032',
+        dark: '#171717',
+        bg: '#ffffff',
+        textDark: '#1d1d1d',
       },
       fontFamily: {
         sans: ['Poppins', 'sans-serif'],
+        display: ['Montserrat', 'sans-serif'],
       },
     },
   },
