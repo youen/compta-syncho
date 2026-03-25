@@ -182,4 +182,52 @@ suite =
                         _ ->
                             Expect.fail "Mauvais état."
             ]
+        , describe "US #4 - Rembourser Client"
+            [ test "RembourserClient avec 3 jetons met à jour la caisse et affiche un succès" <|
+                \_ ->
+                    let
+                        caisseInit =
+                            Caisse.ouvrir 150 1000
+
+                        enServiceInit =
+                            EnService { caisse = caisseInit, jetonsEnCours = 3, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+
+                        ( modelApresRemboursement, _ ) =
+                            update RembourserClient enServiceInit
+                    in
+                    case modelApresRemboursement of
+                        EnService state ->
+                            Expect.all
+                                [ \_ -> Expect.equal 0 state.jetonsEnCours
+                                , \_ -> Expect.equal (1000 + 3) (Caisse.stockCaisse state.caisse)
+                                , \_ -> Expect.equal (150 - 3) (Caisse.fondDeCaisse state.caisse)
+                                , \_ -> Expect.equal (Just "Remboursement effectué : 3€ rendus au client") state.messageSucces
+                                ]
+                                ()
+
+                        _ ->
+                            Expect.fail "Mauvais état."
+            , test "RembourserClient avec 6 jetons est bloqué par la caisse et affiche une erreur" <|
+                \_ ->
+                    let
+                        caisseInit =
+                            Caisse.ouvrir 150 1000
+
+                        enServiceInit =
+                            EnService { caisse = caisseInit, jetonsEnCours = 6, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+
+                        ( modelApresErreur, _ ) =
+                            update RembourserClient enServiceInit
+                    in
+                    case modelApresErreur of
+                        EnService state ->
+                            Expect.all
+                                [ \_ -> Expect.equal 6 state.jetonsEnCours
+                                , \_ -> Expect.equal (Just "Maximum 5 jetons remboursables à la fois") state.messageErreur
+                                ]
+                                ()
+
+                        _ ->
+                            Expect.fail "Mauvais état."
+            ]
         ]

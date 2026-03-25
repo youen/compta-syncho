@@ -112,4 +112,53 @@ suite =
 
                     _ ->
                         Expect.fail "La vente aurait dû échouer pour cause de stock insuffisant."
+        , test "Rembourser 3 jetons incrémente le stock et décrémente le fond de caisse (US #4)" <|
+            \_ ->
+                let
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
+
+                    result =
+                        Caisse.rembourser 3 caisseInitiale
+                in
+                case result of
+                    Ok caissePostRemboursement ->
+                        Expect.all
+                            [ \_ -> Expect.equal (1000 + 3) (Caisse.stockCaisse caissePostRemboursement)
+                            , \_ -> Expect.equal (150 - 3) (Caisse.fondDeCaisse caissePostRemboursement)
+                            ]
+                            ()
+
+                    Err _ ->
+                        Expect.fail "Le remboursement n'aurait pas dû échouer."
+        , test "Rembourser plus de 5 jetons est bloqué et renvoie une erreur (US #4)" <|
+            \_ ->
+                let
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
+
+                    result =
+                        Caisse.rembourser 6 caisseInitiale
+                in
+                case result of
+                    Err "Maximum 5 jetons remboursables à la fois" ->
+                        Expect.pass
+
+                    _ ->
+                        Expect.fail "Le remboursement de > 5 jetons aurait dû être bloqué."
+        , test "Rembourser plus d'argent que disponible dans le fond de caisse renvoie une erreur" <|
+            \_ ->
+                let
+                    caisseInitiale =
+                        Caisse.ouvrir 2 1000
+
+                    result =
+                        Caisse.rembourser 3 caisseInitiale
+                in
+                case result of
+                    Err "Pas assez de liquide en caisse pour rembourser" ->
+                        Expect.pass
+
+                    _ ->
+                        Expect.fail "Le remboursement aurait dû être bloqué car fond insuffisant."
         ]

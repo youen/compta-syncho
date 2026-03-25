@@ -1,4 +1,4 @@
-module Caisse exposing (Caisse, cumulCB, fondDeCaisse, ouvrir, stockCaisse, stockTotal, vendreCB, vendreEspeces)
+module Caisse exposing (Caisse, cumulCB, fondDeCaisse, ouvrir, rembourser, stockCaisse, stockTotal, vendreCB, vendreEspeces)
 
 
 type Caisse
@@ -69,5 +69,23 @@ vendreCB nbJetons (Caisse c) =
                 { fondEnEuros = c.fondEnEuros
                 , jetonsInitiaux = c.jetonsInitiaux - nbJetons
                 , cumulCBEnEuros = c.cumulCBEnEuros + nbJetons
+                }
+            )
+
+
+rembourser : Int -> Caisse -> Result String Caisse
+rembourser nbJetons (Caisse c) =
+    if nbJetons > 5 then
+        Err "Maximum 5 jetons remboursables à la fois"
+
+    else if nbJetons > c.fondEnEuros then
+        Err "Pas assez de liquide en caisse pour rembourser"
+
+    else
+        Ok
+            (Caisse
+                { fondEnEuros = c.fondEnEuros - nbJetons
+                , jetonsInitiaux = c.jetonsInitiaux + nbJetons
+                , cumulCBEnEuros = c.cumulCBEnEuros
                 }
             )

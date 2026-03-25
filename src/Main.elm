@@ -27,6 +27,7 @@ type Msg
     | ValiderVenteEspece
     | ValiderVenteCB
     | AnnulerSaisie
+    | RembourserClient
 
 
 init : () -> ( Model, Cmd Msg )
@@ -158,6 +159,32 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        RembourserClient ->
+            case model of
+                EnService state ->
+                    if state.jetonsEnCours == 0 then
+                        ( EnService { state | messageErreur = Just "Veuillez sélectionner le nombre de jetons à rembourser." }, Cmd.none )
+
+                    else
+                        case Caisse.rembourser state.jetonsEnCours state.caisse of
+                            Ok caisse ->
+                                ( EnService
+                                    { state
+                                        | caisse = caisse
+                                        , jetonsEnCours = 0
+                                        , eurosRecusEnCours = 0
+                                        , messageErreur = Nothing
+                                        , messageSucces = Just ("Remboursement effectué : " ++ String.fromInt state.jetonsEnCours ++ "€ rendus au client")
+                                    }
+                                , Cmd.none
+                                )
+
+                            Err erreur ->
+                                ( EnService { state | messageErreur = Just erreur, messageSucces = Nothing }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
@@ -277,6 +304,11 @@ view model =
                                 ]
                                 [ text "Valider CB" ]
                             ]
+                        , button
+                            [ onClick RembourserClient
+                            , class "w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold p-6 rounded-2xl text-xl shadow-md active:scale-95 transition-all outline-none"
+                            ]
+                            [ text "Rembourser Client (max 5)" ]
                         ]
                     ]
                 ]
