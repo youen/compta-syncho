@@ -181,6 +181,29 @@ suite =
 
                         _ ->
                             Expect.fail "Mauvais état."
+            , test "ValiderVenteCB réinitialise eurosRecusEnCours même si l'utilisateur a saisi du liquide" <|
+                \_ ->
+                    let
+                        caisseInit =
+                            Caisse.ouvrir 150 1000
+
+                        enServiceInit =
+                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 5, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+
+                        ( modelApresValidation, _ ) =
+                            update ValiderVenteCB enServiceInit
+                    in
+                    case modelApresValidation of
+                        EnService state ->
+                            Expect.all
+                                [ \_ -> Expect.equal 0 state.jetonsEnCours
+                                , \_ -> Expect.equal 0 state.eurosRecusEnCours
+                                , \_ -> Expect.equal 10 (Caisse.cumulCB state.caisse)
+                                ]
+                                ()
+
+                        _ ->
+                            Expect.fail "Mauvais état."
             ]
         , describe "US #4 - Rembourser Client"
             [ test "RembourserClient avec 3 jetons met à jour la caisse et affiche un succès" <|
