@@ -30,8 +30,11 @@ suite =
         , test "Vendre 12 jetons avec 20€ doit rendre 8€, diminuer le stock de jetons et augmenter le fond (US #2)" <|
             \_ ->
                 let
-                    caisseInitiale = Caisse.ouvrir 150 1000
-                    result = Caisse.vendreEspeces 12 20 caisseInitiale
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
+
+                    result =
+                        Caisse.vendreEspeces 12 20 caisseInitiale
                 in
                 case result of
                     Ok { caisse, aRendre } ->
@@ -41,32 +44,37 @@ suite =
                             , \_ -> Expect.equal (150 + 12) (Caisse.fondDeCaisse caisse)
                             ]
                             ()
-                            
-                            
+
                     Err _ ->
                         Expect.fail "La vente n'aurait pas dû échouer."
-                        
         , test "Vendre avec montant insuffisant doit renvoyer une erreur" <|
             \_ ->
                 let
-                    caisseInitiale = Caisse.ouvrir 150 1000
-                    result = Caisse.vendreEspeces 12 10 caisseInitiale
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
+
+                    result =
+                        Caisse.vendreEspeces 12 10 caisseInitiale
                 in
                 case result of
                     Err "Montant reçu insuffisant" ->
                         Expect.pass
+
                     _ ->
                         Expect.fail "Devrait refuser la vente car on donne moins que le coût."
-
         , test "Vendre plus de jetons qu'en stock doit renvoyer une erreur" <|
             \_ ->
                 let
-                    caisseInitiale = Caisse.ouvrir 150 10
-                    result = Caisse.vendreEspeces 12 20 caisseInitiale
+                    caisseInitiale =
+                        Caisse.ouvrir 150 10
+
+                    result =
+                        Caisse.vendreEspeces 12 20 caisseInitiale
                 in
                 case result of
                     Err "Plus assez de jetons en caisse" ->
                         Expect.pass
+
                     _ ->
                         Expect.fail "Devrait refuser car stock insuffisant."
         ]
