@@ -50,7 +50,10 @@ cumulCB (Caisse c) =
 
 vendreEspeces : Int -> Int -> Caisse -> Result String { caisse : Caisse, aRendre : Int }
 vendreEspeces nbJetons eurosRecus (Caisse c) =
-    if eurosRecus < nbJetons then
+    if nbJetons <= 0 then
+        Err "Le nombre de jetons doit être supérieur à zero"
+
+    else if eurosRecus < nbJetons then
         Err "Montant reçu insuffisant"
 
     else if c.stockCentrale < nbJetons then
@@ -71,7 +74,10 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
 
 vendreCB : Int -> Caisse -> Result String Caisse
 vendreCB nbJetons (Caisse c) =
-    if c.stockCentrale < nbJetons then
+    if nbJetons <= 0 then
+        Err "Le nombre de jetons doit être supérieur à zero"
+
+    else if c.stockCentrale < nbJetons then
         Err "Plus assez de jetons en caisse"
 
     else
@@ -87,7 +93,10 @@ vendreCB nbJetons (Caisse c) =
 
 rembourser : Int -> Caisse -> Result String Caisse
 rembourser nbJetons (Caisse c) =
-    if nbJetons > 5 then
+    if nbJetons <= 0 then
+        Err "Le nombre de jetons doit être supérieur à zero"
+
+    else if nbJetons > 5 then
         Err "Maximum 5 jetons remboursables à la fois"
 
     else if nbJetons > c.fondEnEuros then
@@ -106,7 +115,10 @@ rembourser nbJetons (Caisse c) =
 
 donnerAuStand : Int -> Caisse -> Result String Caisse
 donnerAuStand nbJetons (Caisse c) =
-    if c.stockCentrale < nbJetons then
+    if nbJetons <= 0 then
+        Err "Le nombre de jetons doit être supérieur à zero"
+
+    else if c.stockCentrale < nbJetons then
         Err "Pas assez de jetons en caisse centrale"
 
     else
@@ -118,7 +130,10 @@ donnerAuStand nbJetons (Caisse c) =
 
 recupererDuStand : Int -> Caisse -> Result String Caisse
 recupererDuStand nbJetons (Caisse c) =
-    if c.stockDansLesStands < nbJetons then
+    if nbJetons <= 0 then
+        Err "Le nombre de jetons doit être supérieur à zero"
+
+    else if c.stockDansLesStands < nbJetons then
         Err "Le stand n'a pas autant de jetons"
 
     else
