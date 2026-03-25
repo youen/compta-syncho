@@ -25,6 +25,7 @@ type Msg
     | AjouterJetons Int
     | AjouterEuros Int
     | ValiderVenteEspece
+    | ValiderVenteCB
     | AnnulerSaisie
 
 
@@ -127,6 +128,32 @@ update msg model =
                         }
                     , Cmd.none
                     )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        ValiderVenteCB ->
+            case model of
+                EnService state ->
+                    if state.jetonsEnCours == 0 then
+                        ( EnService { state | messageErreur = Just "Veuillez sélectionner au moins 1 jeton." }, Cmd.none )
+
+                    else
+                        case Caisse.vendreCB state.jetonsEnCours state.caisse of
+                            Ok caisse ->
+                                ( EnService
+                                    { state
+                                        | caisse = caisse
+                                        , jetonsEnCours = 0
+                                        , eurosRecusEnCours = 0
+                                        , messageErreur = Nothing
+                                        , messageSucces = Just ("Paiement CB validé : " ++ String.fromInt state.jetonsEnCours ++ "€")
+                                    }
+                                , Cmd.none
+                                )
+
+                            Err erreur ->
+                                ( EnService { state | messageErreur = Just erreur, messageSucces = Nothing }, Cmd.none )
 
                 _ ->
                     ( model, Cmd.none )
@@ -237,11 +264,18 @@ view model =
                                 , class "flex-1 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-800 font-bold p-6 rounded-2xl text-xl border-2 border-gray-200 active:scale-95 transition-all outline-none"
                                 ]
                                 [ text "Annuler" ]
-                            , button
+                            ]
+                        , div [ class "flex gap-4 mt-4" ]
+                            [ button
                                 [ onClick ValiderVenteEspece
-                                , class "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
+                                , class "flex-1 bg-green-500 hover:bg-green-600 text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
                                 ]
                                 [ text "Valider Espèces" ]
+                            , button
+                                [ onClick ValiderVenteCB
+                                , class "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
+                                ]
+                                [ text "Valider CB" ]
                             ]
                         ]
                     ]

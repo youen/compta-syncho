@@ -155,4 +155,31 @@ suite =
                         _ ->
                             Expect.fail "Mauvais état."
             ]
+        , describe "US #3 - Vente par CB"
+            [ test "ValiderVenteCB met à jour la caisse et réinitialise les compteurs s'il y a assez de stock" <|
+                \_ ->
+                    let
+                        caisseInit =
+                            Caisse.ouvrir 150 1000
+
+                        enServiceInit =
+                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+
+                        ( modelApresValidation, _ ) =
+                            update ValiderVenteCB enServiceInit
+                    in
+                    case modelApresValidation of
+                        EnService state ->
+                            Expect.all
+                                [ \_ -> Expect.equal 0 state.jetonsEnCours
+                                , \_ -> Expect.equal 0 state.eurosRecusEnCours
+                                , \_ -> Expect.equal (1000 - 10) (Caisse.stockCaisse state.caisse)
+                                , \_ -> Expect.equal 10 (Caisse.cumulCB state.caisse)
+                                , \_ -> Expect.equal (Just "Paiement CB validé : 10€") state.messageSucces
+                                ]
+                                ()
+
+                        _ ->
+                            Expect.fail "Mauvais état."
+            ]
         ]

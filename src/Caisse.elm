@@ -1,10 +1,11 @@
-module Caisse exposing (Caisse, fondDeCaisse, ouvrir, stockCaisse, stockTotal, vendreEspeces)
+module Caisse exposing (Caisse, cumulCB, fondDeCaisse, ouvrir, stockCaisse, stockTotal, vendreCB, vendreEspeces)
 
 
 type Caisse
     = Caisse
         { fondEnEuros : Int
         , jetonsInitiaux : Int
+        , cumulCBEnEuros : Int
         }
 
 
@@ -13,6 +14,7 @@ ouvrir fond jetons =
     Caisse
         { fondEnEuros = fond
         , jetonsInitiaux = jetons
+        , cumulCBEnEuros = 0
         }
 
 
@@ -31,6 +33,11 @@ fondDeCaisse (Caisse c) =
     c.fondEnEuros
 
 
+cumulCB : Caisse -> Int
+cumulCB (Caisse c) =
+    c.cumulCBEnEuros
+
+
 vendreEspeces : Int -> Int -> Caisse -> Result String { caisse : Caisse, aRendre : Int }
 vendreEspeces nbJetons eurosRecus (Caisse c) =
     if eurosRecus < nbJetons then
@@ -43,6 +50,24 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
         Ok
             { caisse =
                 Caisse
-                    { c | jetonsInitiaux = c.jetonsInitiaux - nbJetons, fondEnEuros = c.fondEnEuros + nbJetons }
+                    { fondEnEuros = c.fondEnEuros + nbJetons
+                    , jetonsInitiaux = c.jetonsInitiaux - nbJetons
+                    , cumulCBEnEuros = c.cumulCBEnEuros
+                    }
             , aRendre = eurosRecus - nbJetons
             }
+
+
+vendreCB : Int -> Caisse -> Result String Caisse
+vendreCB nbJetons (Caisse c) =
+    if c.jetonsInitiaux < nbJetons then
+        Err "Plus assez de jetons en caisse"
+
+    else
+        Ok
+            (Caisse
+                { fondEnEuros = c.fondEnEuros
+                , jetonsInitiaux = c.jetonsInitiaux - nbJetons
+                , cumulCBEnEuros = c.cumulCBEnEuros + nbJetons
+                }
+            )

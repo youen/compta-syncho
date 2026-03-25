@@ -77,4 +77,39 @@ suite =
 
                     _ ->
                         Expect.fail "Devrait refuser car stock insuffisant."
+        , test "Vendre par CB décrémente le stock et incrémente le cumul CB (US #3)" <|
+            \_ ->
+                let
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
+
+                    result =
+                        Caisse.vendreCB 5 caisseInitiale
+                in
+                case result of
+                    Ok caissePostVente ->
+                        Expect.all
+                            [ \_ -> Expect.equal (1000 - 5) (Caisse.stockCaisse caissePostVente)
+                            , \_ -> Expect.equal 150 (Caisse.fondDeCaisse caissePostVente)
+                            , \_ -> Expect.equal 5 (Caisse.cumulCB caissePostVente)
+                            ]
+                            ()
+
+                    Err _ ->
+                        Expect.fail "La vente CB n'aurait pas dû échouer."
+        , test "Vendre par CB plus de jetons qu'en stock doit renvoyer une erreur" <|
+            \_ ->
+                let
+                    caisseInitiale =
+                        Caisse.ouvrir 150 3
+
+                    result =
+                        Caisse.vendreCB 5 caisseInitiale
+                in
+                case result of
+                    Err "Plus assez de jetons en caisse" ->
+                        Expect.pass
+
+                    _ ->
+                        Expect.fail "La vente aurait dû échouer pour cause de stock insuffisant."
         ]
