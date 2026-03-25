@@ -132,5 +132,27 @@ suite =
 
                         _ ->
                             Expect.fail "Mauvais état."
+            , test "L'envoi du message AnnulerSaisie réinitialise les compteurs de jetons et d'euros en cours" <|
+                \_ ->
+                    let
+                        caisseInit =
+                            Caisse.ouvrir 150 1000
+
+                        enServiceAvecSaisie =
+                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing }
+
+                        ( modelApresAnnulation, _ ) =
+                            update AnnulerSaisie enServiceAvecSaisie
+                    in
+                    case modelApresAnnulation of
+                        EnService state ->
+                            Expect.all
+                                [ \_ -> Expect.equal 0 state.jetonsEnCours
+                                , \_ -> Expect.equal 0 state.eurosRecusEnCours
+                                ]
+                                ()
+
+                        _ ->
+                            Expect.fail "Mauvais état."
             ]
         ]

@@ -25,6 +25,7 @@ type Msg
     | AjouterJetons Int
     | AjouterEuros Int
     | ValiderVenteEspece
+    | AnnulerSaisie
 
 
 init : () -> ( Model, Cmd Msg )
@@ -110,6 +111,22 @@ update msg model =
 
                             Err erreur ->
                                 ( EnService { state | messageErreur = Just erreur, messageSucces = Nothing }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        AnnulerSaisie ->
+            case model of
+                EnService state ->
+                    ( EnService
+                        { state
+                            | jetonsEnCours = 0
+                            , eurosRecusEnCours = 0
+                            , messageErreur = Nothing
+                            , messageSucces = Nothing
+                        }
+                    , Cmd.none
+                    )
 
                 _ ->
                     ( model, Cmd.none )
@@ -214,11 +231,18 @@ view model =
                                 Nothing ->
                                     text ""
                             ]
-                        , button
-                            [ onClick ValiderVenteEspece
-                            , class "w-full bg-primary hover:bg-primaryDark text-white font-bold p-6 rounded-2xl text-2xl shadow-xl active:scale-95 transition-all mt-8"
+                        , div [ class "flex gap-4 mt-8" ]
+                            [ button
+                                [ onClick AnnulerSaisie
+                                , class "flex-1 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-800 font-bold p-6 rounded-2xl text-xl border-2 border-gray-200 active:scale-95 transition-all outline-none"
+                                ]
+                                [ text "Annuler" ]
+                            , button
+                                [ onClick ValiderVenteEspece
+                                , class "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
+                                ]
+                                [ text "Valider Espèces" ]
                             ]
-                            [ text "Valider Espèces" ]
                         ]
                     ]
                 ]
