@@ -1,9 +1,9 @@
-port module Main exposing (Model(..), Msg(..), init, main, update)
+port module Main exposing (Model(..), Msg(..), init, main, subscriptions, update)
 
 import Browser
 import Caisse exposing (Caisse)
-import Html exposing (Html, button, div, h1, h2, input, label, span, text)
-import Html.Attributes exposing (class, placeholder, type_, value)
+import Html exposing (Html, button, div, h1, h2, img, input, label, span, text)
+import Html.Attributes exposing (class, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -17,6 +17,7 @@ type Model
         , eurosRecusEnCours : Int
         , messageErreur : Maybe String
         , messageSucces : Maybe String
+        , qrCodeDataURL : Maybe String
         }
 
 
@@ -33,12 +34,25 @@ type Msg
     | DonnerJetonsAuStand
     | RecupererJetonsDuStand
     | ApprovisionnerJetonsPapier
+    | GenererQRCode
+    | ExporterCSV
+    | QRCodeRecu String
+    | FermerModalQR
 
 
 -- PORTS
 
 
 port sauvegarderCaisse : Encode.Value -> Cmd msg
+
+
+port genererQRCode : String -> Cmd msg
+
+
+port exporterCSV : Encode.Value -> Cmd msg
+
+
+port qrcodeRecu : (String -> msg) -> Sub msg
 
 
 init : Maybe String -> ( Model, Cmd Msg )
@@ -53,6 +67,7 @@ init maybeFlags =
                         , eurosRecusEnCours = 0
                         , messageErreur = Nothing
                         , messageSucces = Nothing
+                        , qrCodeDataURL = Nothing
                         }
                     , Cmd.none
                     )
@@ -98,6 +113,7 @@ update msg model =
                                 , eurosRecusEnCours = 0
                                 , messageErreur = Nothing
                                 , messageSucces = Nothing
+                                , qrCodeDataURL = Nothing
                                 }
                             , sauvegarderCaisse (Caisse.encode caisse)
                             )
@@ -295,6 +311,43 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        GenererQRCode ->
+            case model of
+                EnService state ->
+                    ( model, genererQRCode (Encode.encode 0 (Caisse.encode state.caisse)) )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        QRCodeRecu dataURL ->
+            case model of
+                EnService state ->
+                    ( EnService { state | qrCodeDataURL = Just dataURL }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        FermerModalQR ->
+            case model of
+                EnService state ->
+                    ( EnService { state | qrCodeDataURL = Nothing }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        ExporterCSV ->
+            case model of
+                EnService state ->
+                    ( model, exporterCSV (Caisse.encode state.caisse) )
+
+                _ ->
+                    ( model, Cmd.none )
+
+
+subscriptions : Model -> Sub Msg
+subscriptions _ =
+    qrcodeRecu QRCodeRecu
+
 
 view : Model -> Html Msg
 view model =
@@ -343,7 +396,7 @@ view model =
                         [ text "Caisse Centrale" ]
                     , div [ class "text-sm font-semibold text-right" ]
                         [ div [ class "text-gray-400" ] [ text ("Fond: " ++ String.fromInt (Caisse.fondDeCaisse state.caisse) ++ "€ | CB: " ++ String.fromInt (Caisse.cumulCB state.caisse) ++ "€") ]
-                        , div [ class (if Caisse.stockCaisse state.caisse < 200 then "text-red-500 animate-pulse" else "text-gray-400") ] 
+                        , div [ class (if Caisse.stockCaisse state.caisse < 200 then "text-red-500 animate-pulse" else "text-gray-400") ]
                             [ text ("Stock: " ++ String.fromInt (Caisse.stockCaisse state.caisse) ++ " | Stands: " ++ String.fromInt (Caisse.stockStands state.caisse) ++ " | Total: " ++ String.fromInt (Caisse.stockTotal state.caisse)) ]
                         ]
                     ]
@@ -411,6 +464,7 @@ view model =
 
                                 Nothing ->
                                     text ""
+
                             , case state.messageSucces of
                                 Just msgSucces ->
                                     div [ class "bg-primary text-white p-4 rounded-xl font-bold text-2xl text-center shadow-lg mt-4" ] [ text msgSucces ]
@@ -442,8 +496,40 @@ view model =
                             , class "w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold p-6 rounded-2xl text-xl shadow-md active:scale-95 transition-all outline-none"
                             ]
                             [ text "Rembourser Client (max 5)" ]
+                        , div [ class "flex gap-2 mt-8 border-t-2 pt-6 border-gray-200" ]
+                            [ button
+                                [ onClick GenererQRCode
+                                , class "flex-1 bg-gray-800 text-white font-bold p-4 rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-black transition-colors"
+                                ]
+                                [ text "QR Code Sync" ]
+                            , button
+                                [ onClick ExporterCSV
+                                , class "flex-1 bg-gray-200 text-gray-700 font-bold p-4 rounded-xl text-sm hover:bg-gray-300 transition-colors"
+                                ]
+                                [ text "Export CSV" ]
+                            ]
                         ]
                     ]
+                , -- Modal QR Code
+                  case state.qrCodeDataURL of
+                    Just dataURL ->
+                        div [ class "fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6" ]
+                            [ div [ class "bg-white p-8 rounded-3xl shadow-2xl max-w-sm w-full flex flex-col items-center gap-6" ]
+                                [ h2 [ class "text-2xl font-black text-dark text-center uppercase" ] [ text "Synchronisation" ]
+                                , div [ class "bg-white p-4 rounded-2xl shadow-inner border-2 border-gray-100" ]
+                                    [ img [ src dataURL, class "w-64 h-64" ] [] ]
+                                , div [ class "text-sm text-gray-500 text-center" ]
+                                    [ text "Scannez ce code sur un smartphone pour consulter l'état de la caisse en temps réel." ]
+                                , button
+                                    [ onClick FermerModalQR
+                                    , class "w-full bg-primary text-white font-bold py-4 rounded-xl shadow-lg hover:bg-primaryDark transition-all active:scale-95"
+                                    ]
+                                    [ text "Fermer" ]
+                                ]
+                            ]
+
+                    Nothing ->
+                        text ""
                 ]
 
 
@@ -453,5 +539,5 @@ main =
         { init = init
         , update = update
         , view = view
-        , subscriptions = \_ -> Sub.none
+        , subscriptions = subscriptions
         }

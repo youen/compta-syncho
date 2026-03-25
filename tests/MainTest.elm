@@ -86,7 +86,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 0, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 0, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
 
                         ( model1, _ ) =
                             update (AjouterJetons 5) enServiceInit
@@ -114,7 +114,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
 
                         ( modelMiseAJour, _ ) =
                             update ValiderVenteEspece enServiceInit
@@ -139,7 +139,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceAvecSaisie =
-                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
 
                         ( modelApresAnnulation, _ ) =
                             update AnnulerSaisie enServiceAvecSaisie
@@ -163,7 +163,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
 
                         ( modelApresValidation, _ ) =
                             update ValiderVenteCB enServiceInit
@@ -190,7 +190,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 3, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 3, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
 
                         ( modelApresRemboursement, _ ) =
                             update RembourserClient enServiceInit
@@ -214,7 +214,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 6, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 6, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
 
                         ( modelApresErreur, _ ) =
                             update RembourserClient enServiceInit
@@ -235,7 +235,7 @@ suite =
                 \_ ->
                     let
                         caisseInit = Caisse.ouvrir 150 1000
-                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 100, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 100, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
                         
                         ( modelApresDon, _ ) = update DonnerJetonsAuStand enServiceInit
                     in
@@ -259,7 +259,7 @@ suite =
                     case Caisse.donnerAuStand 200 caisseInit of
                         Ok caisseAvecStands ->
                             let
-                                enServiceInit = EnService { caisse = caisseAvecStands, jetonsEnCours = 50, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                                enServiceInit = EnService { caisse = caisseAvecStands, jetonsEnCours = 50, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
                                 
                                 ( modelApresRecup, _ ) = update RecupererJetonsDuStand enServiceInit
                             in
@@ -281,7 +281,7 @@ suite =
                 \_ ->
                     let
                         caisseInit = Caisse.ouvrir 150 1000
-                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 500, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 500, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
                         
                         ( modelApresAppro, _ ) = update ApprovisionnerJetonsPapier enServiceInit
                     in
