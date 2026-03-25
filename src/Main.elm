@@ -488,7 +488,14 @@ view model =
                                 [ text "Valider Espèces" ]
                             , button
                                 [ onClick ValiderVenteCB
-                                , class "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
+                                , Html.Attributes.disabled (state.eurosRecusEnCours > 0)
+                                , class
+                                    (if state.eurosRecusEnCours > 0 then
+                                        "flex-1 bg-gray-300 text-gray-500 cursor-not-allowed font-bold p-6 rounded-2xl text-xl shadow-none transition-all outline-none"
+
+                                     else
+                                        "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
+                                    )
                                 ]
                                 [ text "Valider CB" ]
                             ]
