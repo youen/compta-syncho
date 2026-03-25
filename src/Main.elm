@@ -382,7 +382,7 @@ view model =
                                     text ""
                             , case state.messageSucces of
                                 Just msgSucces ->
-                                    div [ class "bg-primary text-white p-4 rounded-xl font-bold text-2xl text-center shadow-lg mt-4 animate-bounce" ] [ text msgSucces ]
+                                    div [ class "bg-primary text-white p-4 rounded-xl font-bold text-2xl text-center shadow-lg mt-4" ] [ text msgSucces ]
 
                                 Nothing ->
                                     text ""
