@@ -14,7 +14,7 @@ suite =
                 \_ ->
                     let
                         ( model1, _ ) =
-                            init ()
+                            init Nothing
 
                         ( model2, _ ) =
                             update (SetFond "150") model1
@@ -36,7 +36,7 @@ suite =
                 \_ ->
                     let
                         ( initialModel, _ ) =
-                            init ()
+                            init Nothing
 
                         ( modelConf1, _ ) =
                             update (SetFond "150") initialModel
@@ -63,7 +63,7 @@ suite =
                 \_ ->
                     let
                         ( initialModel, _ ) =
-                            init ()
+                            init Nothing
 
                         ( modelConf, _ ) =
                             update (SetFond "abc") initialModel

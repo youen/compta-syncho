@@ -1,4 +1,7 @@
-module Caisse exposing (Caisse, ajouterJetonsPapier, cumulCB, donnerAuStand, fondDeCaisse, ouvrir, recupererDuStand, rembourser, stockCaisse, stockStands, stockTotal, vendreCB, vendreEspeces)
+module Caisse exposing (Caisse, ajouterJetonsPapier, cumulCB, decoder, donnerAuStand, encode, fondDeCaisse, ouvrir, recupererDuStand, rembourser, stockCaisse, stockStands, stockTotal, vendreCB, vendreEspeces)
+
+import Json.Decode as Decode
+import Json.Encode as Encode
 
 
 type Caisse
@@ -129,3 +132,33 @@ ajouterJetonsPapier : Int -> Caisse -> Caisse
 ajouterJetonsPapier nbJetons (Caisse c) =
     Caisse
         { c | stockCentrale = c.stockCentrale + nbJetons }
+
+
+-- JSON
+
+
+encode : Caisse -> Encode.Value
+encode (Caisse c) =
+    Encode.object
+        [ ( "fondEnEuros", Encode.int c.fondEnEuros )
+        , ( "stockCentrale", Encode.int c.stockCentrale )
+        , ( "cumulCBEnEuros", Encode.int c.cumulCBEnEuros )
+        , ( "stockDansLesStands", Encode.int c.stockDansLesStands )
+        ]
+
+
+decoder : Decode.Decoder Caisse
+decoder =
+    Decode.map4
+        (\f s c stands ->
+            Caisse
+                { fondEnEuros = f
+                , stockCentrale = s
+                , cumulCBEnEuros = c
+                , stockDansLesStands = stands
+                }
+        )
+        (Decode.field "fondEnEuros" Decode.int)
+        (Decode.field "stockCentrale" Decode.int)
+        (Decode.field "cumulCBEnEuros" Decode.int)
+        (Decode.field "stockDansLesStands" Decode.int)

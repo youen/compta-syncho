@@ -1,10 +1,12 @@
-module Main exposing (Model(..), Msg(..), init, main, update)
+port module Main exposing (Model(..), Msg(..), init, main, update)
 
 import Browser
 import Caisse exposing (Caisse)
 import Html exposing (Html, button, div, h1, h2, input, label, span, text)
 import Html.Attributes exposing (class, placeholder, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Json.Decode as Decode
+import Json.Encode as Encode
 
 
 type Model
@@ -33,9 +35,33 @@ type Msg
     | ApprovisionnerJetonsPapier
 
 
-init : () -> ( Model, Cmd Msg )
-init _ =
-    ( Configuration { fondSaisi = "", jetonsSaisis = "" }, Cmd.none )
+-- PORTS
+
+
+port sauvegarderCaisse : Encode.Value -> Cmd msg
+
+
+init : Maybe String -> ( Model, Cmd Msg )
+init maybeFlags =
+    case maybeFlags of
+        Just json ->
+            case Decode.decodeString Caisse.decoder json of
+                Ok caisse ->
+                    ( EnService
+                        { caisse = caisse
+                        , jetonsEnCours = 0
+                        , eurosRecusEnCours = 0
+                        , messageErreur = Nothing
+                        , messageSucces = Nothing
+                        }
+                    , Cmd.none
+                    )
+
+                Err _ ->
+                    ( Configuration { fondSaisi = "", jetonsSaisis = "" }, Cmd.none )
+
+        Nothing ->
+            ( Configuration { fondSaisi = "", jetonsSaisis = "" }, Cmd.none )
 
 
 update : Msg -> Model -> ( Model, Cmd Msg )
@@ -62,14 +88,18 @@ update msg model =
                 Configuration { fondSaisi, jetonsSaisis } ->
                     case ( String.toInt fondSaisi, String.toInt jetonsSaisis ) of
                         ( Just fond, Just jetons ) ->
+                            let
+                                caisse =
+                                    Caisse.ouvrir fond jetons
+                            in
                             ( EnService
-                                { caisse = Caisse.ouvrir fond jetons
+                                { caisse = caisse
                                 , jetonsEnCours = 0
                                 , eurosRecusEnCours = 0
                                 , messageErreur = Nothing
                                 , messageSucces = Nothing
                                 }
-                            , Cmd.none
+                            , sauvegarderCaisse (Caisse.encode caisse)
                             )
 
                         _ ->
@@ -111,7 +141,7 @@ update msg model =
                                         , messageErreur = Nothing
                                         , messageSucces = Just ("Rendre : " ++ String.fromInt aRendre ++ "€")
                                     }
-                                , Cmd.none
+                                , sauvegarderCaisse (Caisse.encode caisse)
                                 )
 
                             Err erreur ->
@@ -153,7 +183,7 @@ update msg model =
                                         , messageErreur = Nothing
                                         , messageSucces = Just ("Paiement CB validé : " ++ String.fromInt state.jetonsEnCours ++ "€")
                                     }
-                                , Cmd.none
+                                , sauvegarderCaisse (Caisse.encode caisse)
                                 )
 
                             Err erreur ->
@@ -179,7 +209,7 @@ update msg model =
                                         , messageErreur = Nothing
                                         , messageSucces = Just ("Remboursement effectué : " ++ String.fromInt state.jetonsEnCours ++ "€ rendus au client")
                                     }
-                                , Cmd.none
+                                , sauvegarderCaisse (Caisse.encode caisse)
                                 )
 
                             Err erreur ->
@@ -205,7 +235,7 @@ update msg model =
                                         , messageErreur = Nothing
                                         , messageSucces = Just (String.fromInt state.jetonsEnCours ++ " jetons envoyés aux stands")
                                     }
-                                , Cmd.none
+                                , sauvegarderCaisse (Caisse.encode caisse)
                                 )
 
                             Err erreur ->
@@ -231,7 +261,7 @@ update msg model =
                                         , messageErreur = Nothing
                                         , messageSucces = Just (String.fromInt state.jetonsEnCours ++ " jetons récupérés des stands")
                                     }
-                                , Cmd.none
+                                , sauvegarderCaisse (Caisse.encode caisse)
                                 )
 
                             Err erreur ->
@@ -259,7 +289,7 @@ update msg model =
                                 , messageErreur = Nothing
                                 , messageSucces = Just (String.fromInt state.jetonsEnCours ++ " jetons papier ajoutés à la caisse")
                             }
-                        , Cmd.none
+                        , sauvegarderCaisse (Caisse.encode caisse)
                         )
 
                 _ ->
@@ -417,7 +447,7 @@ view model =
                 ]
 
 
-main : Program () Model Msg
+main : Program (Maybe String) Model Msg
 main =
     Browser.element
         { init = init
