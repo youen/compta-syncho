@@ -1,4 +1,4 @@
-module Caisse exposing (Caisse, fondDeCaisse, ouvrir, stockCaisse, stockTotal)
+module Caisse exposing (Caisse, fondDeCaisse, ouvrir, stockCaisse, stockTotal, vendreEspeces)
 
 
 type Caisse
@@ -29,3 +29,17 @@ stockCaisse (Caisse c) =
 fondDeCaisse : Caisse -> Int
 fondDeCaisse (Caisse c) =
     c.fondEnEuros
+
+vendreEspeces : Int -> Int -> Caisse -> Result String { caisse : Caisse, aRendre : Int }
+vendreEspeces nbJetons eurosRecus (Caisse c) =
+    if eurosRecus < nbJetons then
+        Err "Montant reçu insuffisant"
+    else if c.jetonsInitiaux < nbJetons then
+        Err "Plus assez de jetons en caisse"
+    else
+        Ok
+            { caisse = 
+                Caisse 
+                    { c | jetonsInitiaux = c.jetonsInitiaux - nbJetons, fondEnEuros = c.fondEnEuros + nbJetons }
+            , aRendre = eurosRecus - nbJetons
+            }
