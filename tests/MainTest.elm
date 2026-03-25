@@ -230,4 +230,70 @@ suite =
                         _ ->
                             Expect.fail "Mauvais état."
             ]
+        , describe "US #5 - Gestion des flux logistiques (Stands)"
+            [ test "DonnerJetonsAuStand transfère les jetons vers les stands" <|
+                \_ ->
+                    let
+                        caisseInit = Caisse.ouvrir 150 1000
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 100, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                        
+                        ( modelApresDon, _ ) = update DonnerJetonsAuStand enServiceInit
+                    in
+                    case modelApresDon of
+                        EnService state ->
+                            Expect.all
+                                [ \_ -> Expect.equal 0 state.jetonsEnCours
+                                , \_ -> Expect.equal (1000 - 100) (Caisse.stockCaisse state.caisse)
+                                , \_ -> Expect.equal 100 (Caisse.stockStands state.caisse)
+                                , \_ -> Expect.equal (Just "100 jetons envoyés aux stands") state.messageSucces
+                                ]
+                                ()
+                        _ ->
+                            Expect.fail "Mauvais état."
+
+            , test "RecupererJetonsDuStand rapatrie les jetons des stands" <|
+                \_ ->
+                    let
+                        caisseInit = Caisse.ouvrir 150 1000
+                    in
+                    case Caisse.donnerAuStand 200 caisseInit of
+                        Ok caisseAvecStands ->
+                            let
+                                enServiceInit = EnService { caisse = caisseAvecStands, jetonsEnCours = 50, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                                
+                                ( modelApresRecup, _ ) = update RecupererJetonsDuStand enServiceInit
+                            in
+                            case modelApresRecup of
+                                EnService state ->
+                                    Expect.all
+                                        [ \_ -> Expect.equal 0 state.jetonsEnCours
+                                        , \_ -> Expect.equal (800 + 50) (Caisse.stockCaisse state.caisse)
+                                        , \_ -> Expect.equal (200 - 50) (Caisse.stockStands state.caisse)
+                                        , \_ -> Expect.equal (Just "50 jetons récupérés des stands") state.messageSucces
+                                        ]
+                                        ()
+                                _ ->
+                                    Expect.fail "Mauvais état."
+                        Err _ ->
+                            Expect.fail "Donner au stand a échoué dans le setup du test."
+
+            , test "ApprovisionnerJetonsPapier ajoute des jetons au stock central" <|
+                \_ ->
+                    let
+                        caisseInit = Caisse.ouvrir 150 1000
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 500, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing }
+                        
+                        ( modelApresAppro, _ ) = update ApprovisionnerJetonsPapier enServiceInit
+                    in
+                    case modelApresAppro of
+                        EnService state ->
+                            Expect.all
+                                [ \_ -> Expect.equal 0 state.jetonsEnCours
+                                , \_ -> Expect.equal 1500 (Caisse.stockCaisse state.caisse)
+                                , \_ -> Expect.equal (Just "500 jetons papier ajoutés à la caisse") state.messageSucces
+                                ]
+                                ()
+                        _ ->
+                            Expect.fail "Mauvais état."
+            ]
         ]

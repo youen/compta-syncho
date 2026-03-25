@@ -1,11 +1,12 @@
-module Caisse exposing (Caisse, cumulCB, fondDeCaisse, ouvrir, rembourser, stockCaisse, stockTotal, vendreCB, vendreEspeces)
+module Caisse exposing (Caisse, ajouterJetonsPapier, cumulCB, donnerAuStand, fondDeCaisse, ouvrir, recupererDuStand, rembourser, stockCaisse, stockStands, stockTotal, vendreCB, vendreEspeces)
 
 
 type Caisse
     = Caisse
         { fondEnEuros : Int
-        , jetonsInitiaux : Int
+        , stockCentrale : Int
         , cumulCBEnEuros : Int
+        , stockDansLesStands : Int
         }
 
 
@@ -13,19 +14,25 @@ ouvrir : Int -> Int -> Caisse
 ouvrir fond jetons =
     Caisse
         { fondEnEuros = fond
-        , jetonsInitiaux = jetons
+        , stockCentrale = jetons
         , cumulCBEnEuros = 0
+        , stockDansLesStands = 0
         }
 
 
 stockTotal : Caisse -> Int
 stockTotal (Caisse c) =
-    c.jetonsInitiaux
+    c.stockCentrale + c.stockDansLesStands
 
 
 stockCaisse : Caisse -> Int
 stockCaisse (Caisse c) =
-    c.jetonsInitiaux
+    c.stockCentrale
+
+
+stockStands : Caisse -> Int
+stockStands (Caisse c) =
+    c.stockDansLesStands
 
 
 fondDeCaisse : Caisse -> Int
@@ -43,7 +50,7 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
     if eurosRecus < nbJetons then
         Err "Montant reçu insuffisant"
 
-    else if c.jetonsInitiaux < nbJetons then
+    else if c.stockCentrale < nbJetons then
         Err "Plus assez de jetons en caisse"
 
     else
@@ -51,8 +58,9 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
             { caisse =
                 Caisse
                     { fondEnEuros = c.fondEnEuros + nbJetons
-                    , jetonsInitiaux = c.jetonsInitiaux - nbJetons
+                    , stockCentrale = c.stockCentrale - nbJetons
                     , cumulCBEnEuros = c.cumulCBEnEuros
+                    , stockDansLesStands = c.stockDansLesStands
                     }
             , aRendre = eurosRecus - nbJetons
             }
@@ -60,15 +68,16 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
 
 vendreCB : Int -> Caisse -> Result String Caisse
 vendreCB nbJetons (Caisse c) =
-    if c.jetonsInitiaux < nbJetons then
+    if c.stockCentrale < nbJetons then
         Err "Plus assez de jetons en caisse"
 
     else
         Ok
             (Caisse
                 { fondEnEuros = c.fondEnEuros
-                , jetonsInitiaux = c.jetonsInitiaux - nbJetons
+                , stockCentrale = c.stockCentrale - nbJetons
                 , cumulCBEnEuros = c.cumulCBEnEuros + nbJetons
+                , stockDansLesStands = c.stockDansLesStands
                 }
             )
 
@@ -85,7 +94,38 @@ rembourser nbJetons (Caisse c) =
         Ok
             (Caisse
                 { fondEnEuros = c.fondEnEuros - nbJetons
-                , jetonsInitiaux = c.jetonsInitiaux + nbJetons
+                , stockCentrale = c.stockCentrale + nbJetons
                 , cumulCBEnEuros = c.cumulCBEnEuros
+                , stockDansLesStands = c.stockDansLesStands
                 }
             )
+
+
+donnerAuStand : Int -> Caisse -> Result String Caisse
+donnerAuStand nbJetons (Caisse c) =
+    if c.stockCentrale < nbJetons then
+        Err "Pas assez de jetons en caisse centrale"
+
+    else
+        Ok
+            (Caisse
+                { c | stockCentrale = c.stockCentrale - nbJetons, stockDansLesStands = c.stockDansLesStands + nbJetons }
+            )
+
+
+recupererDuStand : Int -> Caisse -> Result String Caisse
+recupererDuStand nbJetons (Caisse c) =
+    if c.stockDansLesStands < nbJetons then
+        Err "Le stand n'a pas autant de jetons"
+
+    else
+        Ok
+            (Caisse
+                { c | stockCentrale = c.stockCentrale + nbJetons, stockDansLesStands = c.stockDansLesStands - nbJetons }
+            )
+
+
+ajouterJetonsPapier : Int -> Caisse -> Caisse
+ajouterJetonsPapier nbJetons (Caisse c) =
+    Caisse
+        { c | stockCentrale = c.stockCentrale + nbJetons }

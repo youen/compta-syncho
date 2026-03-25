@@ -28,6 +28,9 @@ type Msg
     | ValiderVenteCB
     | AnnulerSaisie
     | RembourserClient
+    | DonnerJetonsAuStand
+    | RecupererJetonsDuStand
+    | ApprovisionnerJetonsPapier
 
 
 init : () -> ( Model, Cmd Msg )
@@ -185,6 +188,83 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        DonnerJetonsAuStand ->
+            case model of
+                EnService state ->
+                    if state.jetonsEnCours == 0 then
+                        ( EnService { state | messageErreur = Just "Indiquez le nombre de jetons à envoyer aux stands." }, Cmd.none )
+
+                    else
+                        case Caisse.donnerAuStand state.jetonsEnCours state.caisse of
+                            Ok caisse ->
+                                ( EnService
+                                    { state
+                                        | caisse = caisse
+                                        , jetonsEnCours = 0
+                                        , eurosRecusEnCours = 0
+                                        , messageErreur = Nothing
+                                        , messageSucces = Just (String.fromInt state.jetonsEnCours ++ " jetons envoyés aux stands")
+                                    }
+                                , Cmd.none
+                                )
+
+                            Err erreur ->
+                                ( EnService { state | messageErreur = Just erreur, messageSucces = Nothing }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        RecupererJetonsDuStand ->
+            case model of
+                EnService state ->
+                    if state.jetonsEnCours == 0 then
+                        ( EnService { state | messageErreur = Just "Indiquez le nombre de jetons à récupérer des stands." }, Cmd.none )
+
+                    else
+                        case Caisse.recupererDuStand state.jetonsEnCours state.caisse of
+                            Ok caisse ->
+                                ( EnService
+                                    { state
+                                        | caisse = caisse
+                                        , jetonsEnCours = 0
+                                        , eurosRecusEnCours = 0
+                                        , messageErreur = Nothing
+                                        , messageSucces = Just (String.fromInt state.jetonsEnCours ++ " jetons récupérés des stands")
+                                    }
+                                , Cmd.none
+                                )
+
+                            Err erreur ->
+                                ( EnService { state | messageErreur = Just erreur, messageSucces = Nothing }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        ApprovisionnerJetonsPapier ->
+            case model of
+                EnService state ->
+                    if state.jetonsEnCours == 0 then
+                        ( EnService { state | messageErreur = Just "Indiquez le nombre de jetons papier à ajouter." }, Cmd.none )
+
+                    else
+                        let
+                            caisse =
+                                Caisse.ajouterJetonsPapier state.jetonsEnCours state.caisse
+                        in
+                        ( EnService
+                            { state
+                                | caisse = caisse
+                                , jetonsEnCours = 0
+                                , eurosRecusEnCours = 0
+                                , messageErreur = Nothing
+                                , messageSucces = Just (String.fromInt state.jetonsEnCours ++ " jetons papier ajoutés à la caisse")
+                            }
+                        , Cmd.none
+                        )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 view : Model -> Html Msg
 view model =
@@ -231,8 +311,10 @@ view model =
                 [ div [ class "w-full bg-dark text-white p-6 shadow-md flex justify-between items-center" ]
                     [ h1 [ class "font-display font-bold text-2xl uppercase tracking-wide text-primary" ]
                         [ text "Caisse Centrale" ]
-                    , div [ class "text-sm text-gray-400 font-semibold" ]
-                        [ text ("Stock: " ++ String.fromInt (Caisse.stockCaisse state.caisse) ++ " | Fond: " ++ String.fromInt (Caisse.fondDeCaisse state.caisse) ++ "€") ]
+                    , div [ class "text-sm text-gray-400 font-semibold text-right" ]
+                        [ div [] [ text ("Fond: " ++ String.fromInt (Caisse.fondDeCaisse state.caisse) ++ "€ | CB: " ++ String.fromInt (Caisse.cumulCB state.caisse) ++ "€") ]
+                        , div [] [ text ("Stock: " ++ String.fromInt (Caisse.stockCaisse state.caisse) ++ " | Stands: " ++ String.fromInt (Caisse.stockStands state.caisse) ++ " | Total: " ++ String.fromInt (Caisse.stockTotal state.caisse)) ]
+                        ]
                     ]
                 , div [ class "flex-1 flex flex-col md:flex-row p-6 gap-6" ]
                     [ -- Panneau Central (Jetons et Paiement)
@@ -253,6 +335,26 @@ view model =
                                 , button [ onClick (AjouterEuros 10), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "10€" ]
                                 , button [ onClick (AjouterEuros 20), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "20€" ]
                                 , button [ onClick (AjouterEuros 50), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "50€" ]
+                                ]
+                            ]
+                        , div []
+                            [ h2 [ class "text-xl font-bold mb-4 text-textDark border-t-2 pt-6 border-gray-100" ] [ text "3. Stands & Logistique (Flux)" ]
+                            , div [ class "flex gap-4" ]
+                                [ button
+                                    [ onClick DonnerJetonsAuStand
+                                    , class "flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold p-4 rounded-xl text-lg border-2 border-blue-100 transition-colors"
+                                    ]
+                                    [ text "Envoyer aux Stands" ]
+                                , button
+                                    [ onClick RecupererJetonsDuStand
+                                    , class "flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold p-4 rounded-xl text-lg border-2 border-blue-100 transition-colors"
+                                    ]
+                                    [ text "Récupérer des Stands" ]
+                                , button
+                                    [ onClick ApprovisionnerJetonsPapier
+                                    , class "flex-1 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 font-bold p-4 rounded-xl text-lg border-2 border-yellow-100 transition-colors"
+                                    ]
+                                    [ text "Ajouter Jetons Papier" ]
                                 ]
                             ]
                         ]
