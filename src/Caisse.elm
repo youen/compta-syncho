@@ -1,4 +1,4 @@
-module Caisse exposing (Caisse, ajouterJetonsPapier, cumulCB, decoder, donnerAuStand, encode, fondDeCaisse, ouvrir, recupererDuStand, rembourser, stockCaisse, stockStands, stockTotal, vendreCB, vendreEspeces)
+module Caisse exposing (Caisse, ajouterJetonsPapier, cumulCB, decoder, donnerAuStand, encode, fondDeCaisse, jetonsVendus, ouvrir, recupererDuStand, rembourser, stockCaisse, stockStands, stockTotal, vendreCB, vendreEspeces)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -10,6 +10,7 @@ type Caisse
         , stockCentrale : Int
         , cumulCBEnEuros : Int
         , stockDansLesStands : Int
+        , cumulJetonsVendus : Int
         }
 
 
@@ -20,6 +21,7 @@ ouvrir fond jetons =
         , stockCentrale = jetons
         , cumulCBEnEuros = 0
         , stockDansLesStands = 0
+        , cumulJetonsVendus = 0
         }
 
 
@@ -48,6 +50,11 @@ cumulCB (Caisse c) =
     c.cumulCBEnEuros
 
 
+jetonsVendus : Caisse -> Int
+jetonsVendus (Caisse c) =
+    c.cumulJetonsVendus
+
+
 vendreEspeces : Int -> Int -> Caisse -> Result String { caisse : Caisse, aRendre : Int }
 vendreEspeces nbJetons eurosRecus (Caisse c) =
     if nbJetons <= 0 then
@@ -67,6 +74,7 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
                     , stockCentrale = c.stockCentrale - nbJetons
                     , cumulCBEnEuros = c.cumulCBEnEuros
                     , stockDansLesStands = c.stockDansLesStands
+                    , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
                     }
             , aRendre = eurosRecus - nbJetons
             }
@@ -87,6 +95,7 @@ vendreCB nbJetons (Caisse c) =
                 , stockCentrale = c.stockCentrale - nbJetons
                 , cumulCBEnEuros = c.cumulCBEnEuros + nbJetons
                 , stockDansLesStands = c.stockDansLesStands
+                , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
                 }
             )
 
@@ -109,6 +118,7 @@ rembourser nbJetons (Caisse c) =
                 , stockCentrale = c.stockCentrale + nbJetons
                 , cumulCBEnEuros = c.cumulCBEnEuros
                 , stockDansLesStands = c.stockDansLesStands
+                , cumulJetonsVendus = c.cumulJetonsVendus - nbJetons
                 }
             )
 
@@ -159,21 +169,24 @@ encode (Caisse c) =
         , ( "stockCentrale", Encode.int c.stockCentrale )
         , ( "cumulCBEnEuros", Encode.int c.cumulCBEnEuros )
         , ( "stockDansLesStands", Encode.int c.stockDansLesStands )
+        , ( "cumulJetonsVendus", Encode.int c.cumulJetonsVendus )
         ]
 
 
 decoder : Decode.Decoder Caisse
 decoder =
-    Decode.map4
-        (\f s c stands ->
+    Decode.map5
+        (\f s c stands vendus ->
             Caisse
                 { fondEnEuros = f
                 , stockCentrale = s
                 , cumulCBEnEuros = c
                 , stockDansLesStands = stands
+                , cumulJetonsVendus = vendus
                 }
         )
         (Decode.field "fondEnEuros" Decode.int)
         (Decode.field "stockCentrale" Decode.int)
         (Decode.field "cumulCBEnEuros" Decode.int)
         (Decode.field "stockDansLesStands" Decode.int)
+        (Decode.oneOf [ Decode.field "cumulJetonsVendus" Decode.int, Decode.succeed 0 ])

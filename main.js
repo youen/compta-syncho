@@ -40,6 +40,7 @@ app.ports.exporterCSV.subscribe(function(state) {
         ["Date", new Date().toLocaleString()],
         ["Fond de caisse", state.fondEnEuros + "€"],
         ["Ventes CB", state.cumulCBEnEuros + "€"],
+        ["Jetons Vendus (Net)", state.cumulJetonsVendus],
         ["Total Espèces (Théorique)", state.fondEnEuros + "€"],
         ["Stock Central", state.stockCentrale],
         ["Stock Stands", state.stockDansLesStands],

@@ -25,6 +25,7 @@ suite =
                     [ \c -> Expect.equal jetonsInitiaux (Caisse.stockTotal c)
                     , \c -> Expect.equal jetonsInitiaux (Caisse.stockCaisse c)
                     , \c -> Expect.equal fondEnEuros (Caisse.fondDeCaisse c)
+                    , \c -> Expect.equal 0 (Caisse.jetonsVendus c)
                     ]
                     caisse
         , test "Vendre 12 jetons avec 20€ doit rendre 8€, diminuer le stock de jetons et augmenter le fond (US #2)" <|
@@ -42,6 +43,7 @@ suite =
                             [ \_ -> Expect.equal 8 aRendre
                             , \_ -> Expect.equal (1000 - 12) (Caisse.stockCaisse caisse)
                             , \_ -> Expect.equal (150 + 12) (Caisse.fondDeCaisse caisse)
+                            , \_ -> Expect.equal 12 (Caisse.jetonsVendus caisse)
                             ]
                             ()
 
@@ -92,6 +94,7 @@ suite =
                             [ \_ -> Expect.equal (1000 - 5) (Caisse.stockCaisse caissePostVente)
                             , \_ -> Expect.equal 150 (Caisse.fondDeCaisse caissePostVente)
                             , \_ -> Expect.equal 5 (Caisse.cumulCB caissePostVente)
+                            , \_ -> Expect.equal 5 (Caisse.jetonsVendus caissePostVente)
                             ]
                             ()
 
@@ -126,6 +129,7 @@ suite =
                         Expect.all
                             [ \_ -> Expect.equal (1000 + 3) (Caisse.stockCaisse caissePostRemboursement)
                             , \_ -> Expect.equal (150 - 3) (Caisse.fondDeCaisse caissePostRemboursement)
+                            , \_ -> Expect.equal -3 (Caisse.jetonsVendus caissePostRemboursement)
                             ]
                             ()
 

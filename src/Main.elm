@@ -396,6 +396,7 @@ view model =
                         [ text "Caisse Centrale" ]
                     , div [ class "text-sm font-semibold text-right" ]
                         [ div [ class "text-gray-400" ] [ text ("Fond: " ++ String.fromInt (Caisse.fondDeCaisse state.caisse) ++ "€ | CB: " ++ String.fromInt (Caisse.cumulCB state.caisse) ++ "€") ]
+                        , div [ class "text-gray-400 italic" ] [ text ("Vendus: " ++ String.fromInt (Caisse.jetonsVendus state.caisse) ++ " jetons") ]
                         , div [ class (if Caisse.stockCaisse state.caisse < 200 then "text-red-500 animate-pulse" else "text-gray-400") ]
                             [ text ("Stock: " ++ String.fromInt (Caisse.stockCaisse state.caisse) ++ " | Stands: " ++ String.fromInt (Caisse.stockStands state.caisse) ++ " | Total: " ++ String.fromInt (Caisse.stockTotal state.caisse)) ]
                         ]
