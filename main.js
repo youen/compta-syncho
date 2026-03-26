@@ -62,3 +62,29 @@ app.ports.exporterCSV.subscribe(function(state) {
     link.click();
     document.body.removeChild(link);
 });
+
+// Gestion de la veille (Wake Lock)
+let wakeLock = null;
+const requestWakeLock = async () => {
+    try {
+        if ('wakeLock' in navigator) {
+            wakeLock = await navigator.wakeLock.request('screen');
+            console.log('Wake Lock est actif');
+            wakeLock.addEventListener('release', () => {
+                console.log('Wake Lock relâché');
+            });
+        }
+    } catch (err) {
+        console.error(`${err.name}, ${err.message}`);
+    }
+};
+
+// Demander le wake lock au démarrage
+requestWakeLock();
+
+// Réactiver le Wake Lock si l'ongle redevient visible
+document.addEventListener('visibilitychange', () => {
+    if (document.visibilityState === 'visible') {
+        requestWakeLock();
+    }
+});
