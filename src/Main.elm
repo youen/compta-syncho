@@ -402,7 +402,7 @@ view : Model -> Html Msg
 view model =
     case model of
         Configuration { fondSaisi, jetonsSaisis } ->
-            div [ class "w-screen h-screen flex items-center justify-center bg-gray-50 p-6" ]
+            div [ class "w-screen h-dvh flex items-center justify-center bg-gray-50 p-6" ]
                 [ div [ class "w-full max-w-lg bg-white p-10 rounded-3xl shadow-xl flex flex-col gap-8" ]
                     [ h1 [ class "font-display font-black text-primary text-4xl text-center uppercase tracking-tight" ]
                         [ text "Initialisation" ]
@@ -439,7 +439,7 @@ view model =
                 ]
 
         EnService state ->
-            div [ class "w-screen h-screen bg-bg flex flex-col" ]
+            div [ class "w-screen h-dvh bg-bg flex flex-col" ]
                 [ div [ class "w-full bg-dark text-white p-6 shadow-md flex justify-between items-center" ]
                     [ h1 [ class "font-display font-bold text-2xl uppercase tracking-wide text-primary" ]
                         [ text "Caisse Centrale" ]
