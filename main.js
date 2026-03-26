@@ -88,3 +88,19 @@ document.addEventListener('visibilitychange', () => {
         requestWakeLock();
     }
 });
+
+// --- Actions Optionnelles ---
+app.ports.demanderPleinEcran.subscribe(function() {
+    if (document.documentElement.requestFullscreen) {
+        document.documentElement.requestFullscreen().catch(err => {
+            console.error("Erreur lors du passage en plein écran:", err);
+        });
+    } else if (document.documentElement.webkitRequestFullscreen) {
+        document.documentElement.webkitRequestFullscreen();
+    }
+});
+
+app.ports.demanderWakeLock.subscribe(function() {
+    requestWakeLock();
+});
+

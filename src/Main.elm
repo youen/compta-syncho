@@ -44,6 +44,8 @@ type Msg
     | SetResetInput String
     | AnnulerReset
     | ConfirmerReset
+    | DemanderPleinEcran
+    | DemanderWakeLock
 
 
 -- PORTS
@@ -59,6 +61,12 @@ port genererQRCode : String -> Cmd msg
 
 
 port exporterCSV : Encode.Value -> Cmd msg
+
+
+port demanderPleinEcran : () -> Cmd msg
+
+
+port demanderWakeLock : () -> Cmd msg
 
 
 port qrcodeRecu : (String -> msg) -> Sub msg
@@ -392,6 +400,22 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        DemanderPleinEcran ->
+            case model of
+                EnService _ ->
+                    ( model, demanderPleinEcran () )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        DemanderWakeLock ->
+            case model of
+                EnService _ ->
+                    ( model, demanderWakeLock () )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -570,6 +594,18 @@ view model =
                                 , class "flex-none bg-red-100 text-red-600 font-bold p-4 rounded-xl text-sm hover:bg-red-200 transition-colors"
                                 ]
                                 [ text "Reset" ]
+                            ]
+                        , div [ class "flex gap-2 mt-4" ]
+                            [ button
+                                [ onClick DemanderPleinEcran
+                                , class "flex-1 bg-purple-100 text-purple-700 font-bold p-4 rounded-xl text-sm hover:bg-purple-200 transition-colors"
+                                ]
+                                [ text "Plein Écran" ]
+                            , button
+                                [ onClick DemanderWakeLock
+                                , class "flex-1 bg-teal-100 text-teal-700 font-bold p-4 rounded-xl text-sm hover:bg-teal-200 transition-colors"
+                                ]
+                                [ text "Désactiver Veille" ]
                             ]
                         ]
                     ]

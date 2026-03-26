@@ -33,4 +33,21 @@ test.describe('Comportement iPad et Mobile', () => {
         await expect(container).toHaveClass(/h-\[100dvh\]|h-dvh/);
         await expect(container).not.toHaveClass(/h-screen/);
     });
+
+    test('L\'application propose des options pour le plein écran et le screensaver', async ({ page }) => {
+        await page.goto('/');
+        
+        // Passer l'écran de configuration
+        await page.fill('input[placeholder="Ex: 150"]', '100');
+        await page.fill('input[placeholder="Ex: 1000"]', '500');
+        await page.click('button:has-text("Ouvrir la caisse")');
+        
+        // Vérifier la présence des boutons
+        const btnPleinEcran = page.locator('button:has-text("Plein Écran")');
+        const btnWakeLock = page.locator('button:has-text("Désactiver Veille")');
+
+        await expect(btnPleinEcran).toBeVisible();
+        await expect(btnWakeLock).toBeVisible();
+    });
 });
+
