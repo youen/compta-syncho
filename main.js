@@ -25,6 +25,10 @@ app.ports.sauvegarderCaisse.subscribe(function(state) {
     localStorage.setItem('caisse_state', JSON.stringify(state));
 });
 
+app.ports.effacerCaisse.subscribe(function() {
+    localStorage.removeItem('caisse_state');
+});
+
 // QR Code
 app.ports.genererQRCode.subscribe(function(stateJson) {
     const url = window.location.origin + window.location.pathname + '#state=' + btoa(stateJson);

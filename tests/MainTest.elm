@@ -86,7 +86,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 0, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 0, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
 
                         ( model1, _ ) =
                             update (AjouterJetons 5) enServiceInit
@@ -114,7 +114,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
 
                         ( modelMiseAJour, _ ) =
                             update ValiderVenteEspece enServiceInit
@@ -139,7 +139,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceAvecSaisie =
-                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 12, eurosRecusEnCours = 20, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
 
                         ( modelApresAnnulation, _ ) =
                             update AnnulerSaisie enServiceAvecSaisie
@@ -163,7 +163,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
 
                         ( modelApresValidation, _ ) =
                             update ValiderVenteCB enServiceInit
@@ -188,7 +188,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 5, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 10, eurosRecusEnCours = 5, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
 
                         ( modelApresValidation, _ ) =
                             update ValiderVenteCB enServiceInit
@@ -213,7 +213,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 3, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 3, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
 
                         ( modelApresRemboursement, _ ) =
                             update RembourserClient enServiceInit
@@ -237,7 +237,7 @@ suite =
                             Caisse.ouvrir 150 1000
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 6, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                            EnService { caisse = caisseInit, jetonsEnCours = 6, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
 
                         ( modelApresErreur, _ ) =
                             update RembourserClient enServiceInit
@@ -258,7 +258,7 @@ suite =
                 \_ ->
                     let
                         caisseInit = Caisse.ouvrir 150 1000
-                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 100, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 100, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
                         
                         ( modelApresDon, _ ) = update DonnerJetonsAuStand enServiceInit
                     in
@@ -282,7 +282,7 @@ suite =
                     case Caisse.donnerAuStand 200 caisseInit of
                         Ok caisseAvecStands ->
                             let
-                                enServiceInit = EnService { caisse = caisseAvecStands, jetonsEnCours = 50, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                                enServiceInit = EnService { caisse = caisseAvecStands, jetonsEnCours = 50, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
                                 
                                 ( modelApresRecup, _ ) = update RecupererJetonsDuStand enServiceInit
                             in
@@ -304,7 +304,7 @@ suite =
                 \_ ->
                     let
                         caisseInit = Caisse.ouvrir 150 1000
-                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 500, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing }
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 500, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
                         
                         ( modelApresAppro, _ ) = update ApprovisionnerJetonsPapier enServiceInit
                     in
@@ -318,5 +318,40 @@ suite =
                                 ()
                         _ ->
                             Expect.fail "Mauvais état."
+            ]
+        , describe "Fonctionnalité de Reset"
+            [ test "DemanderReset affiche la modal" <|
+                \_ ->
+                    let
+                        caisseInit = Caisse.ouvrir 150 1000
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 0, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "" }
+                        ( modelFinal, _ ) = update DemanderReset enServiceInit
+                    in
+                    case modelFinal of
+                        EnService state -> Expect.equal True state.resetConfirmVisible
+                        _ -> Expect.fail "Mauvais état."
+
+            , test "ConfirmerReset avec mauvais texte ne fait rien" <|
+                \_ ->
+                    let
+                        caisseInit = Caisse.ouvrir 150 1000
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 0, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = True, resetConfirmInput = "WRONG" }
+                        ( modelFinal, _ ) = update ConfirmerReset enServiceInit
+                    in
+                    case modelFinal of
+                        EnService state -> 
+                            Expect.all [ \_ -> Expect.equal True state.resetConfirmVisible ] ()
+                        _ -> Expect.fail "N'aurait pas dû changer d'état."
+
+            , test "ConfirmerReset avec 'RESET' repasse en Configuration" <|
+                \_ ->
+                    let
+                        caisseInit = Caisse.ouvrir 150 1000
+                        enServiceInit = EnService { caisse = caisseInit, jetonsEnCours = 0, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = True, resetConfirmInput = "RESET" }
+                        ( modelFinal, _ ) = update ConfirmerReset enServiceInit
+                    in
+                    case modelFinal of
+                        Configuration _ -> Expect.pass
+                        _ -> Expect.fail "Aurait dû repasser en Configuration."
             ]
         ]

@@ -18,6 +18,8 @@ type Model
         , messageErreur : Maybe String
         , messageSucces : Maybe String
         , qrCodeDataURL : Maybe String
+        , resetConfirmVisible : Bool
+        , resetConfirmInput : String
         }
 
 
@@ -38,12 +40,19 @@ type Msg
     | ExporterCSV
     | QRCodeRecu String
     | FermerModalQR
+    | DemanderReset
+    | SetResetInput String
+    | AnnulerReset
+    | ConfirmerReset
 
 
 -- PORTS
 
 
 port sauvegarderCaisse : Encode.Value -> Cmd msg
+
+
+port effacerCaisse : () -> Cmd msg
 
 
 port genererQRCode : String -> Cmd msg
@@ -68,6 +77,8 @@ init maybeFlags =
                         , messageErreur = Nothing
                         , messageSucces = Nothing
                         , qrCodeDataURL = Nothing
+                        , resetConfirmVisible = False
+                        , resetConfirmInput = ""
                         }
                     , Cmd.none
                     )
@@ -114,6 +125,8 @@ update msg model =
                                 , messageErreur = Nothing
                                 , messageSucces = Nothing
                                 , qrCodeDataURL = Nothing
+                                , resetConfirmVisible = False
+                                , resetConfirmInput = ""
                                 }
                             , sauvegarderCaisse (Caisse.encode caisse)
                             )
@@ -343,6 +356,42 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        DemanderReset ->
+            case model of
+                EnService state ->
+                    ( EnService { state | resetConfirmVisible = True, resetConfirmInput = "" }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        SetResetInput val ->
+            case model of
+                EnService state ->
+                    ( EnService { state | resetConfirmInput = val }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        AnnulerReset ->
+            case model of
+                EnService state ->
+                    ( EnService { state | resetConfirmVisible = False, resetConfirmInput = "" }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
+        ConfirmerReset ->
+            case model of
+                EnService state ->
+                    if String.toUpper state.resetConfirmInput == "RESET" then
+                        ( Configuration { fondSaisi = "", jetonsSaisis = "" }, effacerCaisse () )
+
+                    else
+                        ( model, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
 subscriptions _ =
@@ -516,10 +565,15 @@ view model =
                                 , class "flex-1 bg-gray-200 text-gray-700 font-bold p-4 rounded-xl text-sm hover:bg-gray-300 transition-colors"
                                 ]
                                 [ text "Export CSV" ]
+                            , button
+                                [ onClick DemanderReset
+                                , class "flex-none bg-red-100 text-red-600 font-bold p-4 rounded-xl text-sm hover:bg-red-200 transition-colors"
+                                ]
+                                [ text "Reset" ]
                             ]
                         ]
                     ]
-                , -- Modal QR Code
+                , -- Modals
                   case state.qrCodeDataURL of
                     Just dataURL ->
                         div [ class "fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50 p-6" ]
@@ -538,7 +592,47 @@ view model =
                             ]
 
                     Nothing ->
-                        text ""
+                        if state.resetConfirmVisible then
+                            div [ class "fixed inset-0 bg-black/80 backdrop-blur-md flex items-center justify-center z-50 p-6" ]
+                                [ div [ class "bg-white p-8 rounded-3xl shadow-2xl max-md w-full flex flex-col gap-6" ]
+                                    [ h2 [ class "text-2xl font-black text-red-600 text-center uppercase" ] [ text "Action Dangereuse" ]
+                                    , div [ class "text-gray-600 text-center" ]
+                                        [ text "Vous êtes sur le point de réinitialiser toute la caisse (fond, jetons, ventes). Cette action est irréversible." ]
+                                    , div [ class "bg-red-50 p-4 rounded-xl border-2 border-red-100 flex flex-col gap-3" ]
+                                        [ label [ class "text-sm font-bold text-red-800 uppercase" ] [ text "Tapez le mot RESET pour confirmer" ]
+                                        , input
+                                            [ type_ "text"
+                                            , placeholder "RESET"
+                                            , value state.resetConfirmInput
+                                            , onInput SetResetInput
+                                            , class "w-full p-4 border-2 border-red-200 rounded-xl outline-none focus:border-red-500 text-center font-black text-2xl uppercase"
+                                            ]
+                                            []
+                                        ]
+                                    , div [ class "flex gap-4" ]
+                                        [ button
+                                            [ onClick AnnulerReset
+                                            , class "flex-1 bg-gray-100 text-gray-600 font-bold py-4 rounded-xl hover:bg-gray-200 transition-all"
+                                            ]
+                                            [ text "Annuler" ]
+                                        , button
+                                            [ onClick ConfirmerReset
+                                            , Html.Attributes.disabled (String.toUpper state.resetConfirmInput /= "RESET")
+                                            , class
+                                                (if String.toUpper state.resetConfirmInput == "RESET" then
+                                                    "flex-1 bg-red-600 text-white font-bold py-4 rounded-xl shadow-lg hover:bg-red-700 transition-all active:scale-95"
+
+                                                 else
+                                                    "flex-1 bg-gray-200 text-gray-400 font-bold py-4 rounded-xl cursor-not-allowed"
+                                                )
+                                            ]
+                                            [ text "Réinitialiser" ]
+                                        ]
+                                    ]
+                                ]
+
+                        else
+                            text ""
                 ]
 
 
