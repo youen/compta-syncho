@@ -464,17 +464,7 @@ view model =
 
         EnService state ->
             div [ class "w-screen h-dvh bg-bg flex flex-col" ]
-                [ div [ class "w-full bg-dark text-white p-6 shadow-md flex justify-between items-center" ]
-                    [ h1 [ class "font-display font-bold text-2xl uppercase tracking-wide text-primary" ]
-                        [ text "Caisse Centrale" ]
-                    , div [ class "text-sm font-semibold text-right" ]
-                        [ div [ class "text-gray-400" ] [ text ("Fond: " ++ String.fromInt (Caisse.fondDeCaisse state.caisse) ++ "€ | CB: " ++ String.fromInt (Caisse.cumulCB state.caisse) ++ "€") ]
-                        , div [ class "text-gray-400 italic" ] [ text ("Vendus: " ++ String.fromInt (Caisse.jetonsVendus state.caisse) ++ " jetons") ]
-                        , div [ class (if Caisse.stockCaisse state.caisse < 200 then "text-red-500 animate-pulse" else "text-gray-400") ]
-                            [ text ("Stock: " ++ String.fromInt (Caisse.stockCaisse state.caisse) ++ " | Stands: " ++ String.fromInt (Caisse.stockStands state.caisse) ++ " | Total: " ++ String.fromInt (Caisse.stockTotal state.caisse)) ]
-                        ]
-                    ]
-                , div [ class "flex-1 flex flex-col md:flex-row p-6 gap-6" ]
+                [ div [ class "flex-1 flex flex-col md:flex-row p-6 gap-6" ]
                     [ -- Panneau Central (Jetons et Paiement)
                       div [ class "flex-1 bg-white p-6 rounded-3xl shadow-xl flex flex-col gap-8" ]
                         [ div []
@@ -546,6 +536,11 @@ view model =
                                     , class "flex-1 bg-teal-100 text-teal-700 font-bold p-4 rounded-xl text-sm hover:bg-teal-200 transition-colors"
                                     ]
                                     [ text "Désactiver Veille" ]
+                                ]
+                            , div [ class "mt-6 pt-6 border-t border-gray-100 text-xs font-bold text-gray-500 flex flex-wrap justify-between gap-4" ]
+                                [ div [] [ text ("FOND: " ++ String.fromInt (Caisse.fondDeCaisse state.caisse) ++ "€ | CB: " ++ String.fromInt (Caisse.cumulCB state.caisse) ++ "€ | VENDUS: " ++ String.fromInt (Caisse.jetonsVendus state.caisse)) ]
+                                , div [ class (if Caisse.stockCaisse state.caisse < 200 then "text-red-600 animate-pulse" else "") ]
+                                    [ text ("STOCK: " ++ String.fromInt (Caisse.stockCaisse state.caisse) ++ " | STANDS: " ++ String.fromInt (Caisse.stockStands state.caisse) ++ " | TOTAL: " ++ String.fromInt (Caisse.stockTotal state.caisse)) ]
                                 ]
                             ]
                         ]
