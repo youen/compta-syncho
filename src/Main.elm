@@ -1,4 +1,4 @@
-port module Main exposing (Model(..), Msg(..), init, main, subscriptions, update)
+port module Main exposing (Model(..), Msg(..), init, main, subscriptions, update, view)
 
 import Browser
 import Caisse exposing (Caisse)
@@ -516,6 +516,38 @@ view model =
                                     [ text "Ajouter Jetons Papier" ]
                                 ]
                             ]
+                        , div [ class "mt-auto pt-6 border-t-2 border-gray-100" ]
+                            [ h2 [ class "text-xl font-bold mb-4 text-textDark" ] [ text "4. Outils & Synchronisation" ]
+                            , div [ class "flex gap-2" ]
+                                [ button
+                                    [ onClick GenererQRCode
+                                    , class "flex-1 bg-gray-800 text-white font-bold p-4 rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-black transition-colors"
+                                    ]
+                                    [ text "QR Code Sync" ]
+                                , button
+                                    [ onClick ExporterCSV
+                                    , class "flex-1 bg-gray-200 text-gray-700 font-bold p-4 rounded-xl text-sm hover:bg-gray-300 transition-colors"
+                                    ]
+                                    [ text "Export CSV" ]
+                                , button
+                                    [ onClick DemanderReset
+                                    , class "flex-none bg-red-100 text-red-600 font-bold p-4 rounded-xl text-sm hover:bg-red-200 transition-colors"
+                                    ]
+                                    [ text "Reset" ]
+                                ]
+                            , div [ class "flex gap-2 mt-4" ]
+                                [ button
+                                    [ onClick DemanderPleinEcran
+                                    , class "flex-1 bg-purple-100 text-purple-700 font-bold p-4 rounded-xl text-sm hover:bg-purple-200 transition-colors"
+                                    ]
+                                    [ text "Plein Écran" ]
+                                , button
+                                    [ onClick DemanderWakeLock
+                                    , class "flex-1 bg-teal-100 text-teal-700 font-bold p-4 rounded-xl text-sm hover:bg-teal-200 transition-colors"
+                                    ]
+                                    [ text "Désactiver Veille" ]
+                                ]
+                            ]
                         ]
                     , -- Panneau Latéral (Résumé)
                       div [ class "w-full md:w-1/3 bg-gray-50 p-6 rounded-3xl shadow-inner flex flex-col justify-between border-2 border-gray-200" ]
@@ -578,35 +610,6 @@ view model =
                             , class "w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold p-6 rounded-2xl text-xl shadow-md active:scale-95 transition-all outline-none"
                             ]
                             [ text "Rembourser Client (max 5)" ]
-                        , div [ class "flex gap-2 mt-8 border-t-2 pt-6 border-gray-200" ]
-                            [ button
-                                [ onClick GenererQRCode
-                                , class "flex-1 bg-gray-800 text-white font-bold p-4 rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-black transition-colors"
-                                ]
-                                [ text "QR Code Sync" ]
-                            , button
-                                [ onClick ExporterCSV
-                                , class "flex-1 bg-gray-200 text-gray-700 font-bold p-4 rounded-xl text-sm hover:bg-gray-300 transition-colors"
-                                ]
-                                [ text "Export CSV" ]
-                            , button
-                                [ onClick DemanderReset
-                                , class "flex-none bg-red-100 text-red-600 font-bold p-4 rounded-xl text-sm hover:bg-red-200 transition-colors"
-                                ]
-                                [ text "Reset" ]
-                            ]
-                        , div [ class "flex gap-2 mt-4" ]
-                            [ button
-                                [ onClick DemanderPleinEcran
-                                , class "flex-1 bg-purple-100 text-purple-700 font-bold p-4 rounded-xl text-sm hover:bg-purple-200 transition-colors"
-                                ]
-                                [ text "Plein Écran" ]
-                            , button
-                                [ onClick DemanderWakeLock
-                                , class "flex-1 bg-teal-100 text-teal-700 font-bold p-4 rounded-xl text-sm hover:bg-teal-200 transition-colors"
-                                ]
-                                [ text "Désactiver Veille" ]
-                            ]
                         ]
                     ]
                 , -- Modals
