@@ -216,6 +216,21 @@ suite =
                     Err _ ->
                         Expect.fail "Le don préalable n'aurait pas dû échouer."
 
+        , test "Scénario utilisateur: la vente ajoute les jetons dans le stock des stands pour récupération ultérieure" <|
+            \_ ->
+                let
+                    caisseOuverte = Caisse.ouvrir 10 10
+                in
+                case Caisse.vendreEspeces 5 5 0 caisseOuverte of
+                    Ok { caisse } ->
+                        case Caisse.recupererDuStand 5 0 caisse of
+                            Ok caisseFinale ->
+                                Expect.equal 10 (Caisse.stockCaisse caisseFinale)
+                            Err msg ->
+                                Expect.fail ("La récupération a échoué : " ++ msg)
+                    Err msg ->
+                        Expect.fail ("La vente a échoué : " ++ msg)
+
         , test "Ajouter Jetons Papier incrémente uniquement le stock caisse et le stock total (US #5)" <|
             \_ ->
                 let

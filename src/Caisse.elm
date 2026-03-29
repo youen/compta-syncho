@@ -87,7 +87,7 @@ vendreEspeces nbJetons eurosRecus horodatage (Caisse c) =
                     { fondEnEuros = c.fondEnEuros + nbJetons
                     , stockCentrale = c.stockCentrale - nbJetons
                     , cumulCBEnEuros = c.cumulCBEnEuros
-                    , stockDansLesStands = c.stockDansLesStands
+                    , stockDansLesStands = c.stockDansLesStands + nbJetons
                     , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
                     , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "Espèces" } ]
                     }
@@ -109,7 +109,7 @@ vendreCB nbJetons horodatage (Caisse c) =
                 { fondEnEuros = c.fondEnEuros
                 , stockCentrale = c.stockCentrale - nbJetons
                 , cumulCBEnEuros = c.cumulCBEnEuros + nbJetons
-                , stockDansLesStands = c.stockDansLesStands
+                , stockDansLesStands = c.stockDansLesStands + nbJetons
                 , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
                 , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "CB" } ]
                 }
@@ -133,7 +133,7 @@ rembourser nbJetons horodatage (Caisse c) =
                 { fondEnEuros = c.fondEnEuros - nbJetons
                 , stockCentrale = c.stockCentrale + nbJetons
                 , cumulCBEnEuros = c.cumulCBEnEuros
-                , stockDansLesStands = c.stockDansLesStands
+                , stockDansLesStands = c.stockDansLesStands - nbJetons
                 , cumulJetonsVendus = c.cumulJetonsVendus - nbJetons
                 , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "Remboursement" } ]
                 }

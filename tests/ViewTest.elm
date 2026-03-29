@@ -23,6 +23,7 @@ suite =
                         , qrCodeDataURL = Nothing
                         , resetConfirmVisible = False
                         , resetConfirmInput = ""
+                        , currentTime = 0
                         }
                     html = view model |> Query.fromHtml
                 in
