@@ -209,11 +209,14 @@ suite =
             [ test "RembourserClient avec 3 jetons met à jour la caisse et affiche un succès" <|
                 \_ ->
                     let
-                        caisseInit =
-                            Caisse.ouvrir 150 1000
+                        caisseInit = Caisse.ouvrir 150 1000
+                        caisseApresVente = 
+                            case Caisse.vendreEspeces 5 5 0 caisseInit of
+                                Ok { caisse } -> caisse
+                                Err _ -> caisseInit
 
                         enServiceInit =
-                            EnService { caisse = caisseInit, jetonsEnCours = 3, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "", currentTime = 0 }
+                            EnService { caisse = caisseApresVente, jetonsEnCours = 3, eurosRecusEnCours = 0, messageErreur = Nothing, messageSucces = Nothing, qrCodeDataURL = Nothing, resetConfirmVisible = False, resetConfirmInput = "", currentTime = 0 }
 
                         ( modelApresRemboursement, _ ) =
                             update RembourserClient enServiceInit
@@ -222,8 +225,8 @@ suite =
                         EnService state ->
                             Expect.all
                                 [ \_ -> Expect.equal 0 state.jetonsEnCours
-                                , \_ -> Expect.equal (1000 + 3) (Caisse.stockCaisse state.caisse)
-                                , \_ -> Expect.equal (150 - 3) (Caisse.fondDeCaisse state.caisse)
+                                , \_ -> Expect.equal (1000 - 5 + 3) (Caisse.stockCaisse state.caisse)
+                                , \_ -> Expect.equal (150 + 5 - 3) (Caisse.fondDeCaisse state.caisse)
                                 , \_ -> Expect.equal (Just "Remboursement effectué : 3€ rendus au client") state.messageSucces
                                 ]
                                 ()

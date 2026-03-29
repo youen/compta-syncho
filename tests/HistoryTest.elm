@@ -44,15 +44,19 @@ suite =
             \_ ->
                 let
                     timestamp = 1711710002
-                    caisseInitiale = Caisse.ouvrir 150 1000
-                    result = Caisse.rembourser 3 timestamp caisseInitiale
+                    caisseInit = Caisse.ouvrir 150 1000
+                    result = 
+                        case Caisse.vendreEspeces 5 5 0 caisseInit of
+                            Ok { caisse } -> Caisse.rembourser 3 timestamp caisse
+                            Err _ -> Err "Setup failed"
                 in
                 case result of
                     Ok caisse ->
                         Caisse.historique caisse
+                            |> List.filter (\t -> t.type_ == "Remboursement")
                             |> Expect.equal [ { horodatage = timestamp, montant = 3, type_ = "Remboursement" } ]
-                    _ ->
-                        Expect.fail "Le remboursement devrait réussir"
+                    Err msg ->
+                        Expect.fail ("Le remboursement devrait réussir : " ++ msg)
         , test "Donner aux stands est enregistré dans l'historique" <|
             \_ ->
                 let

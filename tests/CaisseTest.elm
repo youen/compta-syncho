@@ -122,19 +122,21 @@ suite =
                         Caisse.ouvrir 150 1000
 
                     result =
-                        Caisse.rembourser 3 0 caisseInitiale
+                        case Caisse.vendreEspeces 5 5 0 caisseInitiale of
+                            Ok { caisse } -> Caisse.rembourser 3 0 caisse
+                            Err _ -> Err "Setup failed"
                 in
                 case result of
                     Ok caissePostRemboursement ->
                         Expect.all
-                            [ \_ -> Expect.equal (1000 + 3) (Caisse.stockCaisse caissePostRemboursement)
-                            , \_ -> Expect.equal (150 - 3) (Caisse.fondDeCaisse caissePostRemboursement)
-                            , \_ -> Expect.equal -3 (Caisse.jetonsVendus caissePostRemboursement)
+                            [ \_ -> Expect.equal (1000 - 5 + 3) (Caisse.stockCaisse caissePostRemboursement)
+                            , \_ -> Expect.equal (150 + 5 - 3) (Caisse.fondDeCaisse caissePostRemboursement)
+                            , \_ -> Expect.equal (5 - 3) (Caisse.jetonsVendus caissePostRemboursement)
                             ]
                             ()
 
-                    Err _ ->
-                        Expect.fail "Le remboursement n'aurait pas dû échouer."
+                    Err msg ->
+                        Expect.fail ("Le remboursement n'aurait pas dû échouer : " ++ msg)
         , test "Rembourser plus de 5 jetons est bloqué et renvoie une erreur (US #4)" <|
             \_ ->
                 let
@@ -154,10 +156,12 @@ suite =
             \_ ->
                 let
                     caisseInitiale =
-                        Caisse.ouvrir 2 1000
+                        Caisse.ouvrir 0 1000
 
                     result =
-                        Caisse.rembourser 3 0 caisseInitiale
+                        case Caisse.vendreEspeces 1 1 0 caisseInitiale of
+                            Ok { caisse } -> Caisse.rembourser 2 0 caisse
+                            Err _ -> Err "Setup failed"
                 in
                 case result of
                     Err "Pas assez de liquide en caisse pour rembourser" ->
@@ -165,12 +169,14 @@ suite =
 
                     _ ->
                         Expect.fail "Le remboursement aurait dû être bloqué car fond insuffisant."
-
         , test "Donner des jetons à un stand décrémente la caisse et incrémente le stockStand (US #5)" <|
             \_ ->
                 let
-                    caisseInitiale = Caisse.ouvrir 150 1000
-                    result = Caisse.donnerAuStand 200 0 caisseInitiale
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
+
+                    result =
+                        Caisse.donnerAuStand 200 0 caisseInitiale
                 in
                 case result of
                     Ok caisseApresDon ->
@@ -180,25 +186,29 @@ suite =
                             , \_ -> Expect.equal 1000 (Caisse.stockTotal caisseApresDon)
                             ]
                             ()
+
                     Err _ ->
                         Expect.fail "Le transfert n'aurait pas dû échouer."
-
         , test "Donner au stand échoue s'il n'y a pas assez de jetons en caisse" <|
             \_ ->
                 let
-                    caisseInitiale = Caisse.ouvrir 150 100
-                    result = Caisse.donnerAuStand 200 0 caisseInitiale
+                    caisseInitiale =
+                        Caisse.ouvrir 150 100
+
+                    result =
+                        Caisse.donnerAuStand 200 0 caisseInitiale
                 in
                 case result of
                     Err "Pas assez de jetons en caisse centrale" ->
                         Expect.pass
+
                     _ ->
                         Expect.fail "A répondu Ok à tort."
-
         , test "Récupérer des jetons d'un stand incrémente la caisse et décrémente stockStand (US #5)" <|
             \_ ->
                 let
-                    caisseInitiale = Caisse.ouvrir 150 1000
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
                 in
                 case Caisse.donnerAuStand 200 0 caisseInitiale of
                     Ok caisseApresDon ->
@@ -215,27 +225,64 @@ suite =
 
                     Err _ ->
                         Expect.fail "Le don préalable n'aurait pas dû échouer."
-
         , test "Scénario utilisateur: la vente ajoute les jetons dans le stock des stands pour récupération ultérieure" <|
             \_ ->
                 let
-                    caisseOuverte = Caisse.ouvrir 10 10
+                    caisseOuverte =
+                        Caisse.ouvrir 10 10
                 in
                 case Caisse.vendreEspeces 5 5 0 caisseOuverte of
                     Ok { caisse } ->
                         case Caisse.recupererDuStand 5 0 caisse of
                             Ok caisseFinale ->
                                 Expect.equal 10 (Caisse.stockCaisse caisseFinale)
+
                             Err msg ->
                                 Expect.fail ("La récupération a échoué : " ++ msg)
+
                     Err msg ->
                         Expect.fail ("La vente a échoué : " ++ msg)
+
+        , test "Scénario utilisateur: la vente suivie d'un remboursement empêche la récupération par le stand" <|
+            \_ ->
+                let
+                    caisseInit = Caisse.ouvrir 20 20
+                in
+                case Caisse.vendreEspeces 5 5 0 caisseInit of
+                    Ok { caisse } ->
+                        case Caisse.rembourser 5 0 caisse of
+                            Ok caisseRemboursee ->
+                                case Caisse.recupererDuStand 5 0 caisseRemboursee of
+                                    Err msg -> 
+                                        Expect.equal "Le stand n'a pas autant de jetons" msg
+                                    Ok _ -> 
+                                        Expect.fail "La récupération aurait dû échouer car les jetons ont été remboursés."
+                            Err msg ->
+                                Expect.fail ("Le remboursement a échoué : " ++ msg)
+                    Err msg ->
+                        Expect.fail ("La vente a échoué : " ++ msg)
+        , test "Rembourser plus de jetons que ceux en circulation doit échouer" <|
+            \_ ->
+                let
+                    caisseInit = Caisse.ouvrir 20 20
+                in
+                case Caisse.vendreEspeces 2 2 0 caisseInit of
+                    Ok { caisse } ->
+                        case Caisse.rembourser 3 0 caisse of
+                            Err msg -> 
+                                Expect.equal "Pas assez de jetons en circulation pour un remboursement" msg
+                            Ok _ -> 
+                                Expect.fail "Le remboursement aurait dû échouer car il dépasse les jetons en circulation."
+                    Err _ -> Expect.fail "Setup failed."
 
         , test "Ajouter Jetons Papier incrémente uniquement le stock caisse et le stock total (US #5)" <|
             \_ ->
                 let
-                    caisseInitiale = Caisse.ouvrir 150 1000
-                    caisseApresAjoutPapier = Caisse.ajouterJetonsPapier 300 0 caisseInitiale
+                    caisseInitiale =
+                        Caisse.ouvrir 150 1000
+
+                    caisseApresAjoutPapier =
+                        Caisse.ajouterJetonsPapier 300 0 caisseInitiale
                 in
                 Expect.all
                     [ \_ -> Expect.equal 1300 (Caisse.stockCaisse caisseApresAjoutPapier)

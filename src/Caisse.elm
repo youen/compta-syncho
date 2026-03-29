@@ -127,6 +127,9 @@ rembourser nbJetons horodatage (Caisse c) =
     else if nbJetons > c.fondEnEuros then
         Err "Pas assez de liquide en caisse pour rembourser"
 
+    else if nbJetons > c.stockDansLesStands then
+        Err "Pas assez de jetons en circulation pour un remboursement"
+
     else
         Ok
             (Caisse

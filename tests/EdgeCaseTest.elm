@@ -71,19 +71,25 @@ suite =
             [ test "Rembourser pile 5 jetons (limite haute)" <|
                 \_ ->
                     let
-                        caisse = Caisse.ouvrir 100 100
+                        caisseInit = Caisse.ouvrir 100 100
                     in
-                    case Caisse.rembourser 5 0 caisse of
-                        Ok _ -> Expect.pass
-                        Err _ -> Expect.fail "5 jetons devraient être acceptés."
+                    case Caisse.vendreEspeces 5 5 0 caisseInit of
+                        Ok { caisse } ->
+                            case Caisse.rembourser 5 0 caisse of
+                                Ok _ -> Expect.pass
+                                Err msg -> Expect.fail ("5 jetons devraient être acceptés : " ++ msg)
+                        Err _ -> Expect.fail "Setup failed"
             , test "Rembourser plus que le fond de caisse disponible" <|
                 \_ ->
                     let
-                        caisse = Caisse.ouvrir 2 100 -- Fond de 2€ seulement
+                        caisseInit = Caisse.ouvrir 0 100 -- Fond de 0€
                     in
-                    case Caisse.rembourser 3 0 caisse of
-                        Err msg -> Expect.equal "Pas assez de liquide en caisse pour rembourser" msg
-                        Ok _ -> Expect.fail "Le remboursement aurait dû échouer car fond de caisse < 3€."
+                    case Caisse.vendreEspeces 1 1 0 caisseInit of
+                        Ok { caisse } ->
+                            case Caisse.rembourser 2 0 caisse of
+                                Err msg -> Expect.equal "Pas assez de liquide en caisse pour rembourser" msg
+                                Ok _ -> Expect.fail "Le remboursement aurait dû échouer car fond de caisse < 2€."
+                        Err _ -> Expect.fail "Setup failed"
             , test "Rembourser un nombre négatif de jetons" <|
                 \_ ->
                     let
