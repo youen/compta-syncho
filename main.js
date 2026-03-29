@@ -40,24 +40,35 @@ app.ports.genererQRCode.subscribe(function(stateJson) {
 
 // CSV Export
 app.ports.exporterCSV.subscribe(function(state) {
-    const rows = [
-        ["Date", new Date().toLocaleString()],
-        ["Fond de caisse", state.fondEnEuros + "€"],
-        ["Ventes CB", state.cumulCBEnEuros + "€"],
-        ["Jetons Vendus (Net)", state.cumulJetonsVendus],
-        ["Total Espèces (Théorique)", state.fondEnEuros + "€"],
-        ["Stock Central", state.stockCentrale],
-        ["Stock Stands", state.stockDansLesStands],
-        ["Total Jetons", state.stockCentrale + state.stockDansLesStands]
+    const headers = ["Date", "Type", "Montant"];
+    const summaryRows = [
+        ["RECAPITULATIF", "", ""],
+        ["Fond de caisse final", state.fondEnEuros + "€", ""],
+        ["Ventes CB", state.cumulCBEnEuros + "€", ""],
+        ["Jetons Vendus (Net)", state.cumulJetonsVendus, ""],
+        ["Stock Central", state.stockCentrale, ""],
+        ["Stock Stands", state.stockDansLesStands, ""],
+        ["Total Jetons", state.stockCentrale + state.stockDansLesStands, ""],
+        ["", "", ""],
+        ["HISTORIQUE DES TRANSACTIONS", "", ""],
+        headers
     ];
     
+    const historyRows = state.historique.map(t => [
+        new Date(t.horodatage * 1000).toLocaleString(),
+        t.type_,
+        t.montant
+    ]);
+
+    const allRows = summaryRows.concat(historyRows);
+    
     let csvContent = "data:text/csv;charset=utf-8," 
-        + rows.map(e => e.join(",")).join("\n");
+        + allRows.map(e => e.join(",")).join("\n");
         
     const encodedUri = encodeURI(csvContent);
     const link = document.createElement("a");
     link.setAttribute("href", encodedUri);
-    link.setAttribute("download", "cloture_caisse_" + new Date().toISOString().split('T')[0] + ".csv");
+    link.setAttribute("download", "historique_caisse_" + new Date().toISOString().split('T')[0] + ".csv");
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

@@ -7,6 +7,8 @@ import Html.Attributes exposing (class, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import Json.Encode as Encode
+import Task
+import Time
 
 
 type Model
@@ -20,6 +22,7 @@ type Model
         , qrCodeDataURL : Maybe String
         , resetConfirmVisible : Bool
         , resetConfirmInput : String
+        , currentTime : Int
         }
 
 
@@ -46,6 +49,7 @@ type Msg
     | ConfirmerReset
     | DemanderPleinEcran
     | DemanderWakeLock
+    | Tick Time.Posix
 
 
 -- PORTS
@@ -87,8 +91,9 @@ init maybeFlags =
                         , qrCodeDataURL = Nothing
                         , resetConfirmVisible = False
                         , resetConfirmInput = ""
+                        , currentTime = 0
                         }
-                    , Cmd.none
+                    , Task.perform Tick Time.now
                     )
 
                 Err _ ->
@@ -135,8 +140,12 @@ update msg model =
                                 , qrCodeDataURL = Nothing
                                 , resetConfirmVisible = False
                                 , resetConfirmInput = ""
+                                , currentTime = 0
                                 }
-                            , sauvegarderCaisse (Caisse.encode caisse)
+                            , Cmd.batch
+                                [ sauvegarderCaisse (Caisse.encode caisse)
+                                , Task.perform Tick Time.now
+                                ]
                             )
 
                         _ ->
@@ -168,7 +177,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Veuillez sélectionner au moins 1 jeton." }, Cmd.none )
 
                     else
-                        case Caisse.vendreEspeces state.jetonsEnCours state.eurosRecusEnCours 0 state.caisse of
+                        case Caisse.vendreEspeces state.jetonsEnCours state.eurosRecusEnCours state.currentTime state.caisse of
                             Ok { caisse, aRendre } ->
                                 ( EnService
                                     { state
@@ -210,7 +219,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Veuillez sélectionner au moins 1 jeton." }, Cmd.none )
 
                     else
-                        case Caisse.vendreCB state.jetonsEnCours 0 state.caisse of
+                        case Caisse.vendreCB state.jetonsEnCours state.currentTime state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -236,7 +245,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Veuillez sélectionner le nombre de jetons à rembourser." }, Cmd.none )
 
                     else
-                        case Caisse.rembourser state.jetonsEnCours 0 state.caisse of
+                        case Caisse.rembourser state.jetonsEnCours state.currentTime state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -262,7 +271,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Indiquez le nombre de jetons à envoyer aux stands." }, Cmd.none )
 
                     else
-                        case Caisse.donnerAuStand state.jetonsEnCours 0 state.caisse of
+                        case Caisse.donnerAuStand state.jetonsEnCours state.currentTime state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -288,7 +297,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Indiquez le nombre de jetons à récupérer des stands." }, Cmd.none )
 
                     else
-                        case Caisse.recupererDuStand state.jetonsEnCours 0 state.caisse of
+                        case Caisse.recupererDuStand state.jetonsEnCours state.currentTime state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -316,7 +325,7 @@ update msg model =
                     else
                         let
                             caisse =
-                                Caisse.ajouterJetonsPapier state.jetonsEnCours 0 state.caisse
+                                Caisse.ajouterJetonsPapier state.jetonsEnCours state.currentTime state.caisse
                         in
                         ( EnService
                             { state
@@ -416,10 +425,26 @@ update msg model =
                 _ ->
                     ( model, Cmd.none )
 
+        Tick time ->
+            case model of
+                EnService state ->
+                    ( EnService { state | currentTime = Time.posixToMillis time // 1000 }, Cmd.none )
+
+                _ ->
+                    ( model, Cmd.none )
+
 
 subscriptions : Model -> Sub Msg
-subscriptions _ =
-    qrcodeRecu QRCodeRecu
+subscriptions model =
+    Sub.batch
+        [ qrcodeRecu QRCodeRecu
+        , case model of
+            EnService _ ->
+                Time.every 1000 Tick
+
+            _ ->
+                Sub.none
+        ]
 
 
 view : Model -> Html Msg
