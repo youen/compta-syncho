@@ -3,7 +3,7 @@ port module Main exposing (Model(..), Msg(..), init, main, subscriptions, update
 import Browser
 import Caisse exposing (Caisse)
 import Html exposing (Html, button, div, h1, h2, img, input, label, span, text)
-import Html.Attributes exposing (class, placeholder, src, type_, value)
+import Html.Attributes exposing (class, id, placeholder, src, type_, value)
 import Html.Events exposing (onClick, onInput)
 import Json.Decode as Decode
 import Json.Encode as Encode
@@ -488,81 +488,81 @@ view model =
                 ]
 
         EnService state ->
-            div [ class "w-screen h-dvh bg-bg flex flex-col" ]
-                [ div [ class "flex-1 flex flex-col md:flex-row p-6 gap-6" ]
+            div [ class "w-screen h-dvh bg-bg flex flex-col overflow-hidden" ]
+                [ div [ class "flex-1 flex flex-col md:flex-row p-4 gap-4 overflow-hidden" ]
                     [ -- Panneau Central (Jetons et Paiement)
-                      div [ class "flex-1 bg-white p-6 rounded-3xl shadow-xl flex flex-col gap-8" ]
+                      div [ class "flex-1 bg-white p-4 rounded-3xl shadow-xl flex flex-col gap-4 overflow-y-auto md:overflow-hidden" ]
                         [ div []
-                            [ h2 [ class "text-xl font-bold mb-4 text-textDark" ] [ text "1. Nombre de jetons" ]
+                            [ h2 [ class "text-lg font-bold mb-2 text-textDark" ] [ text "1. Nombre de jetons" ]
                             , div [ class "flex gap-4" ]
-                                [ button [ onClick (AjouterJetons 1), class "flex-1 bg-gray-100 hover:bg-gray-200 text-3xl p-6 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+1" ]
-                                , button [ onClick (AjouterJetons 5), class "flex-1 bg-gray-100 hover:bg-gray-200 text-3xl p-6 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+5" ]
-                                , button [ onClick (AjouterJetons 10), class "flex-1 bg-gray-100 hover:bg-gray-200 text-3xl p-6 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+10" ]
+                                [ button [ onClick (AjouterJetons 1), class "flex-1 bg-gray-100 hover:bg-gray-200 text-2xl p-4 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+1" ]
+                                , button [ onClick (AjouterJetons 5), class "flex-1 bg-gray-100 hover:bg-gray-200 text-2xl p-4 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+5" ]
+                                , button [ onClick (AjouterJetons 10), class "flex-1 bg-gray-100 hover:bg-gray-200 text-2xl p-4 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+10" ]
                                 ]
                             ]
                         , div []
-                            [ h2 [ class "text-xl font-bold mb-4 text-textDark" ] [ text "2. Paiement reçu (€)" ]
-                            , div [ class "grid grid-cols-6 gap-4" ]
-                                [ button [ onClick (AjouterEuros 1), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "1€" ]
-                                , button [ onClick (AjouterEuros 2), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "2€" ]
-                                , button [ onClick (AjouterEuros 5), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "5€" ]
-                                , button [ onClick (AjouterEuros 10), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "10€" ]
-                                , button [ onClick (AjouterEuros 20), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "20€" ]
-                                , button [ onClick (AjouterEuros 50), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "50€" ]
+                            [ h2 [ class "text-lg font-bold mb-2 text-textDark" ] [ text "2. Paiement reçu (€)" ]
+                            , div [ class "grid grid-cols-6 gap-3" ]
+                                [ button [ onClick (AjouterEuros 1), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "1€" ]
+                                , button [ onClick (AjouterEuros 2), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "2€" ]
+                                , button [ onClick (AjouterEuros 5), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "5€" ]
+                                , button [ onClick (AjouterEuros 10), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "10€" ]
+                                , button [ onClick (AjouterEuros 20), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "20€" ]
+                                , button [ onClick (AjouterEuros 50), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "50€" ]
                                 ]
                             ]
                         , div []
-                            [ h2 [ class "text-xl font-bold mb-4 text-textDark border-t-2 pt-6 border-gray-100" ] [ text "3. Stands & Logistique (Flux)" ]
-                            , div [ class "flex gap-4" ]
+                            [ h2 [ class "text-lg font-bold mb-2 text-textDark border-t-2 pt-4 border-gray-100" ] [ text "3. Stands & Logistique" ]
+                            , div [ class "flex gap-3" ]
                                 [ button
                                     [ onClick DonnerJetonsAuStand
-                                    , class "flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold p-4 rounded-xl text-lg border-2 border-blue-100 transition-colors"
+                                    , class "flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold p-3 rounded-xl text-base border-2 border-blue-100 transition-colors text-center leading-tight"
                                     ]
-                                    [ text "Envoyer aux Stands" ]
+                                    [ text "Donner Stands" ]
                                 , button
                                     [ onClick RecupererJetonsDuStand
-                                    , class "flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold p-4 rounded-xl text-lg border-2 border-blue-100 transition-colors"
+                                    , class "flex-1 bg-blue-50 text-blue-600 hover:bg-blue-100 font-bold p-3 rounded-xl text-base border-2 border-blue-100 transition-colors text-center leading-tight"
                                     ]
-                                    [ text "Récupérer des Stands" ]
+                                    [ text "Récup. Stands" ]
                                 , button
                                     [ onClick ApprovisionnerJetonsPapier
-                                    , class "flex-1 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 font-bold p-4 rounded-xl text-lg border-2 border-yellow-100 transition-colors"
+                                    , class "flex-1 bg-yellow-50 text-yellow-700 hover:bg-yellow-100 font-bold p-3 rounded-xl text-base border-2 border-yellow-100 transition-colors text-center leading-tight"
                                     ]
-                                    [ text "Ajouter Jetons Papier" ]
+                                    [ text "+ Jetons Papier" ]
                                 ]
                             ]
-                        , div [ class "mt-auto pt-6 border-t-2 border-gray-100" ]
-                            [ h2 [ class "text-xl font-bold mb-4 text-textDark" ] [ text "4. Outils & Synchronisation" ]
+                        , div [ id "tools-panel", class "mt-auto pt-4 border-t-2 border-gray-100" ]
+                            [ h2 [ class "text-lg font-bold mb-2 text-textDark" ] [ text "4. Outils & Synchronisation" ]
                             , div [ class "flex gap-2" ]
                                 [ button
                                     [ onClick GenererQRCode
-                                    , class "flex-1 bg-gray-800 text-white font-bold p-4 rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-black transition-colors"
+                                    , class "flex-1 bg-gray-800 text-white font-bold p-3 rounded-xl text-sm flex items-center justify-center gap-2 hover:bg-black transition-colors"
                                     ]
-                                    [ text "QR Code Sync" ]
+                                    [ text "Sync" ]
                                 , button
                                     [ onClick ExporterCSV
-                                    , class "flex-1 bg-gray-200 text-gray-700 font-bold p-4 rounded-xl text-sm hover:bg-gray-300 transition-colors"
+                                    , class "flex-1 bg-gray-200 text-gray-700 font-bold p-3 rounded-xl text-sm hover:bg-gray-300 transition-colors"
                                     ]
-                                    [ text "Export CSV" ]
+                                    [ text "CSV" ]
                                 , button
                                     [ onClick DemanderReset
-                                    , class "flex-none bg-red-100 text-red-600 font-bold p-4 rounded-xl text-sm hover:bg-red-200 transition-colors"
+                                    , class "flex-none bg-red-100 text-red-600 font-bold p-3 rounded-xl text-sm hover:bg-red-200 transition-colors"
                                     ]
                                     [ text "Reset" ]
                                 ]
-                            , div [ class "flex gap-2 mt-4" ]
+                            , div [ class "flex gap-2 mt-2" ]
                                 [ button
                                     [ onClick DemanderPleinEcran
-                                    , class "flex-1 bg-purple-100 text-purple-700 font-bold p-4 rounded-xl text-sm hover:bg-purple-200 transition-colors"
+                                    , class "flex-1 bg-purple-100 text-purple-700 font-bold p-3 rounded-xl text-sm hover:bg-purple-200 transition-colors"
                                     ]
                                     [ text "Plein Écran" ]
                                 , button
                                     [ onClick DemanderWakeLock
-                                    , class "flex-1 bg-teal-100 text-teal-700 font-bold p-4 rounded-xl text-sm hover:bg-teal-200 transition-colors"
+                                    , class "flex-1 bg-teal-100 text-teal-700 font-bold p-3 rounded-xl text-sm hover:bg-teal-200 transition-colors"
                                     ]
-                                    [ text "Désactiver Veille" ]
+                                    [ text "WakeLock" ]
                                 ]
-                            , div [ class "mt-6 pt-6 border-t border-gray-100 text-xs font-bold text-gray-500 flex flex-wrap justify-between gap-4" ]
+                            , div [ class "mt-4 pt-4 border-t border-gray-100 text-xs font-bold text-gray-500 flex flex-wrap justify-between gap-2" ]
                                 [ div [] [ text ("FOND: " ++ String.fromInt (Caisse.fondDeCaisse state.caisse) ++ "€ | CB: " ++ String.fromInt (Caisse.cumulCB state.caisse) ++ "€ | VENDUS: " ++ String.fromInt (Caisse.jetonsVendus state.caisse)) ]
                                 , div [ class (if Caisse.stockCaisse state.caisse < 200 then "text-red-600 animate-pulse" else "") ]
                                     [ text ("STOCK: " ++ String.fromInt (Caisse.stockCaisse state.caisse) ++ " | STANDS: " ++ String.fromInt (Caisse.stockStands state.caisse) ++ " | TOTAL: " ++ String.fromInt (Caisse.stockTotal state.caisse)) ]
@@ -570,66 +570,62 @@ view model =
                             ]
                         ]
                     , -- Panneau Latéral (Résumé)
-                      div [ class "w-full md:w-1/3 bg-gray-50 p-6 rounded-3xl shadow-inner flex flex-col justify-between border-2 border-gray-200" ]
-                        [ div [ class "flex flex-col gap-6" ]
-                            [ h2 [ class "text-2xl font-black text-textDark border-b-2 border-gray-200 pb-4" ] [ text "Résumé Vente" ]
-                            , div [ class "flex justify-between items-center text-xl" ]
+                      div [ class "w-full md:w-1/3 bg-gray-50 p-4 rounded-3xl shadow-inner flex flex-col justify-between border-2 border-gray-200 overflow-hidden" ]
+                        [ div [ class "flex flex-col gap-2" ]
+                            [ h2 [ class "text-xl font-black text-textDark border-b-2 border-gray-200 pb-2" ] [ text "Résumé Vente" ]
+                            , div [ class "flex justify-between items-center text-lg" ]
                                 [ text "Jetons :"
-                                , span [ class "font-bold text-primary text-3xl" ] [ text (String.fromInt state.jetonsEnCours) ]
+                                , span [ class "font-bold text-primary text-2xl" ] [ text (String.fromInt state.jetonsEnCours) ]
                                 ]
-                            , div [ class "flex justify-between items-center text-xl" ]
+                            , div [ class "flex justify-between items-center text-lg" ]
                                 [ text "Total à payer :"
-                                , span [ class "font-bold text-3xl" ] [ text (String.fromInt state.jetonsEnCours ++ "€") ]
+                                , span [ class "font-bold text-2xl" ] [ text (String.fromInt state.jetonsEnCours ++ "€") ]
                                 ]
-                            , div [ class "flex justify-between items-center text-xl" ]
+                            , div [ class "flex justify-between items-center text-lg" ]
                                 [ text "Reçu :"
-                                , span [ class "font-bold text-green-600 text-3xl" ] [ text (String.fromInt state.eurosRecusEnCours ++ "€") ]
+                                , span [ class "font-bold text-green-600 text-2xl" ] [ text (String.fromInt state.eurosRecusEnCours ++ "€") ]
                                 ]
                             , case state.messageErreur of
                                 Just err ->
-                                    div [ class "bg-red-100 text-red-700 p-4 rounded-xl font-bold mt-4" ] [ text err ]
-
-                                Nothing ->
-                                    text ""
-
+                                    div [ class "bg-red-100 text-red-700 p-2 rounded-xl font-bold mt-2 text-sm" ] [ text err ]
+                                Nothing -> text ""
                             , case state.messageSucces of
                                 Just msgSucces ->
-                                    div [ class "bg-primary text-white p-4 rounded-xl font-bold text-2xl text-center shadow-lg mt-4" ] [ text msgSucces ]
-
-                                Nothing ->
-                                    text ""
+                                    div [ class "bg-primary text-white p-2 rounded-xl font-bold text-lg text-center shadow-lg mt-2" ] [ text msgSucces ]
+                                Nothing -> text ""
                             ]
-                        , div [ class "flex gap-4 mt-8" ]
-                            [ button
-                                [ onClick AnnulerSaisie
-                                , class "flex-1 bg-white text-gray-500 hover:bg-gray-100 hover:text-gray-800 font-bold p-6 rounded-2xl text-xl border-2 border-gray-200 active:scale-95 transition-all outline-none"
+                        , div [ class "flex flex-col gap-2 mt-4" ]
+                            [ div [ class "flex gap-2" ]
+                                [ button
+                                    [ onClick AnnulerSaisie
+                                    , class "flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold p-4 rounded-xl text-lg border-2 border-gray-200 active:scale-95 transition-all outline-none"
+                                    ]
+                                    [ text "Annuler" ]
                                 ]
-                                [ text "Annuler" ]
-                            ]
-                        , div [ class "flex gap-4 mt-4" ]
-                            [ button
-                                [ onClick ValiderVenteEspece
-                                , class "flex-1 bg-green-500 hover:bg-green-600 text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
+                            , div [ class "flex gap-2" ]
+                                [ button
+                                    [ onClick ValiderVenteEspece
+                                    , class "flex-1 bg-green-500 hover:bg-green-600 text-white font-bold p-4 rounded-xl text-lg shadow-lg active:scale-95 transition-all outline-none"
+                                    ]
+                                    [ text "Espèces" ]
+                                , button
+                                    [ onClick ValiderVenteCB
+                                    , Html.Attributes.disabled (state.eurosRecusEnCours > 0)
+                                    , class
+                                        (if state.eurosRecusEnCours > 0 then
+                                            "flex-1 bg-gray-300 text-gray-500 cursor-not-allowed font-bold p-4 rounded-xl text-lg shadow-none transition-all outline-none"
+                                         else
+                                            "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-4 rounded-xl text-lg shadow-lg active:scale-95 transition-all outline-none"
+                                        )
+                                    ]
+                                    [ text "CB" ]
                                 ]
-                                [ text "Valider Espèces" ]
                             , button
-                                [ onClick ValiderVenteCB
-                                , Html.Attributes.disabled (state.eurosRecusEnCours > 0)
-                                , class
-                                    (if state.eurosRecusEnCours > 0 then
-                                        "flex-1 bg-gray-300 text-gray-500 cursor-not-allowed font-bold p-6 rounded-2xl text-xl shadow-none transition-all outline-none"
-
-                                     else
-                                        "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-6 rounded-2xl text-xl shadow-xl active:scale-95 transition-all outline-none"
-                                    )
+                                [ onClick RembourserClient
+                                , class "w-full bg-orange-500 hover:bg-orange-600 text-white font-bold p-4 rounded-xl text-lg shadow-md active:scale-95 transition-all outline-none"
                                 ]
-                                [ text "Valider CB" ]
+                                [ text "Rembourser Client" ]
                             ]
-                        , button
-                            [ onClick RembourserClient
-                            , class "w-full mt-4 bg-orange-500 hover:bg-orange-600 text-white font-bold p-6 rounded-2xl text-xl shadow-md active:scale-95 transition-all outline-none"
-                            ]
-                            [ text "Rembourser Client (max 5)" ]
                         ]
                     ]
                 , -- Modals

@@ -3,7 +3,7 @@ module ViewTest exposing (..)
 import Main exposing (Model(..), view)
 import Test exposing (Test, describe, test)
 import Test.Html.Query as Query
-import Test.Html.Selector exposing (class, text, tag)
+import Test.Html.Selector exposing (class, id, text, tag)
 import Caisse
 import Expect
 
@@ -33,13 +33,13 @@ suite =
                     
                     -- Le panneau de gauche doit contenir les outils ET les compteurs
                     , \_ -> html
-                        |> Query.find [ class "gap-8" ] -- Panneau de gauche
+                        |> Query.find [ id "tools-panel" ]
                         |> Expect.all
-                            [ Query.has [ text "QR Code Sync" ]
-                            , Query.has [ text "Export CSV" ]
+                            [ Query.has [ text "Sync" ]
+                            , Query.has [ text "CSV" ]
                             , Query.has [ text "Reset" ]
                             , Query.has [ text "Plein Écran" ]
-                            , Query.has [ text "Désactiver Veille" ]
+                            , Query.has [ text "WakeLock" ]
                             -- Il doit contenir les informations de la caisse (en majuscules selon l'implémentation)
                             , Query.has [ text "FOND: 150€" ]
                             , Query.has [ text "STOCK: 1000" ]
