@@ -35,7 +35,7 @@ suite =
                         Caisse.ouvrir 150 1000
 
                     result =
-                        Caisse.vendreEspeces 12 20 caisseInitiale
+                        Caisse.vendreEspeces 12 20 0 caisseInitiale
                 in
                 case result of
                     Ok { caisse, aRendre } ->
@@ -56,7 +56,7 @@ suite =
                         Caisse.ouvrir 150 1000
 
                     result =
-                        Caisse.vendreEspeces 12 10 caisseInitiale
+                        Caisse.vendreEspeces 12 10 0 caisseInitiale
                 in
                 case result of
                     Err "Montant reçu insuffisant" ->
@@ -71,7 +71,7 @@ suite =
                         Caisse.ouvrir 150 10
 
                     result =
-                        Caisse.vendreEspeces 12 20 caisseInitiale
+                        Caisse.vendreEspeces 12 20 0 caisseInitiale
                 in
                 case result of
                     Err "Plus assez de jetons en caisse" ->
@@ -86,7 +86,7 @@ suite =
                         Caisse.ouvrir 150 1000
 
                     result =
-                        Caisse.vendreCB 5 caisseInitiale
+                        Caisse.vendreCB 5 0 caisseInitiale
                 in
                 case result of
                     Ok caissePostVente ->
@@ -107,7 +107,7 @@ suite =
                         Caisse.ouvrir 150 3
 
                     result =
-                        Caisse.vendreCB 5 caisseInitiale
+                        Caisse.vendreCB 5 0 caisseInitiale
                 in
                 case result of
                     Err "Plus assez de jetons en caisse" ->
@@ -122,7 +122,7 @@ suite =
                         Caisse.ouvrir 150 1000
 
                     result =
-                        Caisse.rembourser 3 caisseInitiale
+                        Caisse.rembourser 3 0 caisseInitiale
                 in
                 case result of
                     Ok caissePostRemboursement ->
@@ -142,7 +142,7 @@ suite =
                         Caisse.ouvrir 150 1000
 
                     result =
-                        Caisse.rembourser 6 caisseInitiale
+                        Caisse.rembourser 6 0 caisseInitiale
                 in
                 case result of
                     Err "Maximum 5 jetons remboursables à la fois" ->
@@ -157,7 +157,7 @@ suite =
                         Caisse.ouvrir 2 1000
 
                     result =
-                        Caisse.rembourser 3 caisseInitiale
+                        Caisse.rembourser 3 0 caisseInitiale
                 in
                 case result of
                     Err "Pas assez de liquide en caisse pour rembourser" ->
@@ -170,7 +170,7 @@ suite =
             \_ ->
                 let
                     caisseInitiale = Caisse.ouvrir 150 1000
-                    result = Caisse.donnerAuStand 200 caisseInitiale
+                    result = Caisse.donnerAuStand 200 0 caisseInitiale
                 in
                 case result of
                     Ok caisseApresDon ->
@@ -187,7 +187,7 @@ suite =
             \_ ->
                 let
                     caisseInitiale = Caisse.ouvrir 150 100
-                    result = Caisse.donnerAuStand 200 caisseInitiale
+                    result = Caisse.donnerAuStand 200 0 caisseInitiale
                 in
                 case result of
                     Err "Pas assez de jetons en caisse centrale" ->
@@ -200,9 +200,9 @@ suite =
                 let
                     caisseInitiale = Caisse.ouvrir 150 1000
                 in
-                case Caisse.donnerAuStand 200 caisseInitiale of
+                case Caisse.donnerAuStand 200 0 caisseInitiale of
                     Ok caisseApresDon ->
-                        case Caisse.recupererDuStand 50 caisseApresDon of
+                        case Caisse.recupererDuStand 50 0 caisseApresDon of
                             Ok caisseApresRecup ->
                                 Expect.all
                                     [ \_ -> Expect.equal (800 + 50) (Caisse.stockCaisse caisseApresRecup)
@@ -220,7 +220,7 @@ suite =
             \_ ->
                 let
                     caisseInitiale = Caisse.ouvrir 150 1000
-                    caisseApresAjoutPapier = Caisse.ajouterJetonsPapier 300 caisseInitiale
+                    caisseApresAjoutPapier = Caisse.ajouterJetonsPapier 300 0 caisseInitiale
                 in
                 Expect.all
                     [ \_ -> Expect.equal 1300 (Caisse.stockCaisse caisseApresAjoutPapier)

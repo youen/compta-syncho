@@ -69,8 +69,8 @@ jetonsVendus (Caisse c) =
     c.cumulJetonsVendus
 
 
-vendreEspeces : Int -> Int -> Caisse -> Result String { caisse : Caisse, aRendre : Int }
-vendreEspeces nbJetons eurosRecus (Caisse c) =
+vendreEspeces : Int -> Int -> Int -> Caisse -> Result String { caisse : Caisse, aRendre : Int }
+vendreEspeces nbJetons eurosRecus horodatage (Caisse c) =
     if nbJetons <= 0 then
         Err "Le nombre de jetons doit être supérieur à zero"
 
@@ -89,14 +89,14 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
                     , cumulCBEnEuros = c.cumulCBEnEuros
                     , stockDansLesStands = c.stockDansLesStands
                     , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
-                    , historique = c.historique
+                    , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "Espèces" } ]
                     }
             , aRendre = eurosRecus - nbJetons
             }
 
 
-vendreCB : Int -> Caisse -> Result String Caisse
-vendreCB nbJetons (Caisse c) =
+vendreCB : Int -> Int -> Caisse -> Result String Caisse
+vendreCB nbJetons horodatage (Caisse c) =
     if nbJetons <= 0 then
         Err "Le nombre de jetons doit être supérieur à zero"
 
@@ -111,13 +111,13 @@ vendreCB nbJetons (Caisse c) =
                 , cumulCBEnEuros = c.cumulCBEnEuros + nbJetons
                 , stockDansLesStands = c.stockDansLesStands
                 , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
-                , historique = c.historique
+                , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "CB" } ]
                 }
             )
 
 
-rembourser : Int -> Caisse -> Result String Caisse
-rembourser nbJetons (Caisse c) =
+rembourser : Int -> Int -> Caisse -> Result String Caisse
+rembourser nbJetons horodatage (Caisse c) =
     if nbJetons <= 0 then
         Err "Le nombre de jetons doit être supérieur à zero"
 
@@ -135,13 +135,13 @@ rembourser nbJetons (Caisse c) =
                 , cumulCBEnEuros = c.cumulCBEnEuros
                 , stockDansLesStands = c.stockDansLesStands
                 , cumulJetonsVendus = c.cumulJetonsVendus - nbJetons
-                , historique = c.historique
+                , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "Remboursement" } ]
                 }
             )
 
 
-donnerAuStand : Int -> Caisse -> Result String Caisse
-donnerAuStand nbJetons (Caisse c) =
+donnerAuStand : Int -> Int -> Caisse -> Result String Caisse
+donnerAuStand nbJetons horodatage (Caisse c) =
     if nbJetons <= 0 then
         Err "Le nombre de jetons doit être supérieur à zero"
 
@@ -151,12 +151,16 @@ donnerAuStand nbJetons (Caisse c) =
     else
         Ok
             (Caisse
-                { c | stockCentrale = c.stockCentrale - nbJetons, stockDansLesStands = c.stockDansLesStands + nbJetons }
+                { c
+                    | stockCentrale = c.stockCentrale - nbJetons
+                    , stockDansLesStands = c.stockDansLesStands + nbJetons
+                    , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "Transfert Stand" } ]
+                }
             )
 
 
-recupererDuStand : Int -> Caisse -> Result String Caisse
-recupererDuStand nbJetons (Caisse c) =
+recupererDuStand : Int -> Int -> Caisse -> Result String Caisse
+recupererDuStand nbJetons horodatage (Caisse c) =
     if nbJetons <= 0 then
         Err "Le nombre de jetons doit être supérieur à zero"
 
@@ -166,14 +170,21 @@ recupererDuStand nbJetons (Caisse c) =
     else
         Ok
             (Caisse
-                { c | stockCentrale = c.stockCentrale + nbJetons, stockDansLesStands = c.stockDansLesStands - nbJetons }
+                { c
+                    | stockCentrale = c.stockCentrale + nbJetons
+                    , stockDansLesStands = c.stockDansLesStands - nbJetons
+                    , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "Récupération Stand" } ]
+                }
             )
 
 
-ajouterJetonsPapier : Int -> Caisse -> Caisse
-ajouterJetonsPapier nbJetons (Caisse c) =
+ajouterJetonsPapier : Int -> Int -> Caisse -> Caisse
+ajouterJetonsPapier nbJetons horodatage (Caisse c) =
     Caisse
-        { c | stockCentrale = c.stockCentrale + nbJetons }
+        { c
+            | stockCentrale = c.stockCentrale + nbJetons
+            , historique = c.historique ++ [ { horodatage = horodatage, montant = nbJetons, type_ = "Ajout Papier" } ]
+        }
 
 
 -- JSON

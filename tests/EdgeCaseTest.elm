@@ -38,7 +38,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 100 0
                     in
-                    case Caisse.vendreEspeces 1 10 caisse of
+                    case Caisse.vendreEspeces 1 10 0 caisse of
                         Err msg -> Expect.equal "Plus assez de jetons en caisse" msg
                         Ok _ -> Expect.fail "La vente aurait dû échouer."
             , test "On ne peut pas vendre un nombre négatif de jetons" <|
@@ -46,7 +46,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 100 100
                     in
-                    case Caisse.vendreEspeces -1 10 caisse of
+                    case Caisse.vendreEspeces -1 10 0 caisse of
                         Err _ -> Expect.pass
                         Ok _ -> Expect.fail "Vendre un nombre négatif devrait être interdit."
             , test "Vendre avec 0 jetons demandés" <|
@@ -55,7 +55,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 100 100
                     in
-                    case Caisse.vendreEspeces 0 10 caisse of
+                    case Caisse.vendreEspeces 0 10 0 caisse of
                         Err _ -> Expect.pass
                         Ok _ -> Expect.fail "Vendre 0 jetons devrait être interdit."
             , test "Vendre exactement le dernier jeton" <|
@@ -63,7 +63,7 @@ suite =
                     let
                         caisseInit = Caisse.ouvrir 100 1
                     in
-                    case Caisse.vendreEspeces 1 1 caisseInit of
+                    case Caisse.vendreEspeces 1 1 0 caisseInit of
                         Ok { caisse } -> Expect.equal 0 (Caisse.stockCaisse caisse)
                         Err _ -> Expect.fail "Devrait pouvoir vendre le dernier jeton."
             ]
@@ -73,7 +73,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 100 100
                     in
-                    case Caisse.rembourser 5 caisse of
+                    case Caisse.rembourser 5 0 caisse of
                         Ok _ -> Expect.pass
                         Err _ -> Expect.fail "5 jetons devraient être acceptés."
             , test "Rembourser plus que le fond de caisse disponible" <|
@@ -81,7 +81,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 2 100 -- Fond de 2€ seulement
                     in
-                    case Caisse.rembourser 3 caisse of
+                    case Caisse.rembourser 3 0 caisse of
                         Err msg -> Expect.equal "Pas assez de liquide en caisse pour rembourser" msg
                         Ok _ -> Expect.fail "Le remboursement aurait dû échouer car fond de caisse < 3€."
             , test "Rembourser un nombre négatif de jetons" <|
@@ -89,7 +89,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 100 100
                     in
-                    case Caisse.rembourser -1 caisse of
+                    case Caisse.rembourser -1 0 caisse of
                         Err _ -> Expect.pass
                         Ok _ -> Expect.fail "Rembourser un nombre négatif devrait être interdit."
             ]
@@ -99,7 +99,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 100 10
                     in
-                    case Caisse.donnerAuStand 11 caisse of
+                    case Caisse.donnerAuStand 11 0 caisse of
                         Err msg -> Expect.equal "Pas assez de jetons en caisse centrale" msg
                         Ok _ -> Expect.fail "N'aurait pas dû permettre de donner 11 jetons quand on en a 10."
             , test "Récupérer plus de jetons que les stands n'en ont" <|
@@ -107,9 +107,9 @@ suite =
                     let
                         caisseInit = Caisse.ouvrir 100 100
                     in
-                    case Caisse.donnerAuStand 20 caisseInit of
+                    case Caisse.donnerAuStand 20 0 caisseInit of
                         Ok caisseAvecStands ->
-                            case Caisse.recupererDuStand 21 caisseAvecStands of
+                            case Caisse.recupererDuStand 21 0 caisseAvecStands of
                                 Err msg -> Expect.equal "Le stand n'a pas autant de jetons" msg
                                 Ok _ -> Expect.fail "N'aurait pas dû permettre de récupérer 21 jetons quand les stands en ont 20."
                         Err _ -> Expect.fail "Setup failed."
@@ -118,7 +118,7 @@ suite =
                     let
                         caisse = Caisse.ouvrir 100 100
                     in
-                    case Caisse.donnerAuStand -1 caisse of
+                    case Caisse.donnerAuStand -1 0 caisse of
                         Err _ -> Expect.pass
                         Ok _ -> Expect.fail "Donner un nombre négatif devrait être interdit."
             ]
@@ -129,7 +129,7 @@ suite =
                         caisseInit = Caisse.ouvrir 100 1000
                         totalAvant = Caisse.stockTotal caisseInit
                     in
-                    case Caisse.donnerAuStand 300 caisseInit of
+                    case Caisse.donnerAuStand 300 0 caisseInit of
                         Ok caisseApres ->
                             Expect.equal totalAvant (Caisse.stockTotal caisseApres)
                         Err _ -> Expect.fail "Mouvement échoué."

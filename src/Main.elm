@@ -168,7 +168,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Veuillez sélectionner au moins 1 jeton." }, Cmd.none )
 
                     else
-                        case Caisse.vendreEspeces state.jetonsEnCours state.eurosRecusEnCours state.caisse of
+                        case Caisse.vendreEspeces state.jetonsEnCours state.eurosRecusEnCours 0 state.caisse of
                             Ok { caisse, aRendre } ->
                                 ( EnService
                                     { state
@@ -210,7 +210,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Veuillez sélectionner au moins 1 jeton." }, Cmd.none )
 
                     else
-                        case Caisse.vendreCB state.jetonsEnCours state.caisse of
+                        case Caisse.vendreCB state.jetonsEnCours 0 state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -236,7 +236,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Veuillez sélectionner le nombre de jetons à rembourser." }, Cmd.none )
 
                     else
-                        case Caisse.rembourser state.jetonsEnCours state.caisse of
+                        case Caisse.rembourser state.jetonsEnCours 0 state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -262,7 +262,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Indiquez le nombre de jetons à envoyer aux stands." }, Cmd.none )
 
                     else
-                        case Caisse.donnerAuStand state.jetonsEnCours state.caisse of
+                        case Caisse.donnerAuStand state.jetonsEnCours 0 state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -288,7 +288,7 @@ update msg model =
                         ( EnService { state | messageErreur = Just "Indiquez le nombre de jetons à récupérer des stands." }, Cmd.none )
 
                     else
-                        case Caisse.recupererDuStand state.jetonsEnCours state.caisse of
+                        case Caisse.recupererDuStand state.jetonsEnCours 0 state.caisse of
                             Ok caisse ->
                                 ( EnService
                                     { state
@@ -316,7 +316,7 @@ update msg model =
                     else
                         let
                             caisse =
-                                Caisse.ajouterJetonsPapier state.jetonsEnCours state.caisse
+                                Caisse.ajouterJetonsPapier state.jetonsEnCours 0 state.caisse
                         in
                         ( EnService
                             { state
