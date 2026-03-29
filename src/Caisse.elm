@@ -1,7 +1,14 @@
-module Caisse exposing (Caisse, ajouterJetonsPapier, cumulCB, decoder, donnerAuStand, encode, fondDeCaisse, jetonsVendus, ouvrir, recupererDuStand, rembourser, stockCaisse, stockStands, stockTotal, vendreCB, vendreEspeces)
+module Caisse exposing (Caisse, Transaction, ajouterJetonsPapier, cumulCB, decoder, donnerAuStand, encode, fondDeCaisse, historique, jetonsVendus, ouvrir, recupererDuStand, rembourser, stockCaisse, stockStands, stockTotal, vendreCB, vendreEspeces)
 
 import Json.Decode as Decode
 import Json.Encode as Encode
+
+
+type alias Transaction =
+    { horodatage : Int
+    , montant : Int
+    , type_ : String
+    }
 
 
 type Caisse
@@ -11,6 +18,7 @@ type Caisse
         , cumulCBEnEuros : Int
         , stockDansLesStands : Int
         , cumulJetonsVendus : Int
+        , historique : List Transaction
         }
 
 
@@ -22,7 +30,13 @@ ouvrir fond jetons =
         , cumulCBEnEuros = 0
         , stockDansLesStands = 0
         , cumulJetonsVendus = 0
+        , historique = []
         }
+
+
+historique : Caisse -> List Transaction
+historique (Caisse c) =
+    c.historique
 
 
 stockTotal : Caisse -> Int
@@ -75,6 +89,7 @@ vendreEspeces nbJetons eurosRecus (Caisse c) =
                     , cumulCBEnEuros = c.cumulCBEnEuros
                     , stockDansLesStands = c.stockDansLesStands
                     , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
+                    , historique = c.historique
                     }
             , aRendre = eurosRecus - nbJetons
             }
@@ -96,6 +111,7 @@ vendreCB nbJetons (Caisse c) =
                 , cumulCBEnEuros = c.cumulCBEnEuros + nbJetons
                 , stockDansLesStands = c.stockDansLesStands
                 , cumulJetonsVendus = c.cumulJetonsVendus + nbJetons
+                , historique = c.historique
                 }
             )
 
@@ -119,6 +135,7 @@ rembourser nbJetons (Caisse c) =
                 , cumulCBEnEuros = c.cumulCBEnEuros
                 , stockDansLesStands = c.stockDansLesStands
                 , cumulJetonsVendus = c.cumulJetonsVendus - nbJetons
+                , historique = c.historique
                 }
             )
 
@@ -170,19 +187,30 @@ encode (Caisse c) =
         , ( "cumulCBEnEuros", Encode.int c.cumulCBEnEuros )
         , ( "stockDansLesStands", Encode.int c.stockDansLesStands )
         , ( "cumulJetonsVendus", Encode.int c.cumulJetonsVendus )
+        , ( "historique", Encode.list encodeTransaction c.historique )
+        ]
+
+
+encodeTransaction : Transaction -> Encode.Value
+encodeTransaction t =
+    Encode.object
+        [ ( "horodatage", Encode.int t.horodatage )
+        , ( "montant", Encode.int t.montant )
+        , ( "type_", Encode.string t.type_ )
         ]
 
 
 decoder : Decode.Decoder Caisse
 decoder =
-    Decode.map5
-        (\f s c stands vendus ->
+    Decode.map6
+        (\f s c stands vendus h ->
             Caisse
                 { fondEnEuros = f
                 , stockCentrale = s
                 , cumulCBEnEuros = c
                 , stockDansLesStands = stands
                 , cumulJetonsVendus = vendus
+                , historique = h
                 }
         )
         (Decode.field "fondEnEuros" Decode.int)
@@ -190,3 +218,12 @@ decoder =
         (Decode.field "cumulCBEnEuros" Decode.int)
         (Decode.field "stockDansLesStands" Decode.int)
         (Decode.oneOf [ Decode.field "cumulJetonsVendus" Decode.int, Decode.succeed 0 ])
+        (Decode.oneOf [ Decode.field "historique" (Decode.list decoderTransaction), Decode.succeed [] ])
+
+
+decoderTransaction : Decode.Decoder Transaction
+decoderTransaction =
+    Decode.map3 Transaction
+        (Decode.field "horodatage" Decode.int)
+        (Decode.field "montant" Decode.int)
+        (Decode.field "type_" Decode.string)
