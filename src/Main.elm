@@ -495,20 +495,20 @@ view model =
                         [ div []
                             [ h2 [ class "text-lg font-bold mb-2 text-textDark" ] [ text "1. Nombre de jetons" ]
                             , div [ class "flex gap-4" ]
-                                [ button [ onClick (AjouterJetons 1), class "flex-1 bg-gray-100 hover:bg-gray-200 text-2xl p-4 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+1" ]
-                                , button [ onClick (AjouterJetons 5), class "flex-1 bg-gray-100 hover:bg-gray-200 text-2xl p-4 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+5" ]
-                                , button [ onClick (AjouterJetons 10), class "flex-1 bg-gray-100 hover:bg-gray-200 text-2xl p-4 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+10" ]
+                                [ button [ onClick (AjouterJetons 1), class "flex-1 bg-gray-100 hover:bg-gray-200 text-3xl p-5 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+1" ]
+                                , button [ onClick (AjouterJetons 5), class "flex-1 bg-gray-100 hover:bg-gray-200 text-3xl p-5 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+5" ]
+                                , button [ onClick (AjouterJetons 10), class "flex-1 bg-gray-100 hover:bg-gray-200 text-3xl p-5 rounded-2xl font-bold text-gray-800 transition-colors" ] [ text "+10" ]
                                 ]
                             ]
                         , div []
                             [ h2 [ class "text-lg font-bold mb-2 text-textDark" ] [ text "2. Paiement reçu (€)" ]
                             , div [ class "grid grid-cols-6 gap-3" ]
-                                [ button [ onClick (AjouterEuros 1), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "1€" ]
-                                , button [ onClick (AjouterEuros 2), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "2€" ]
-                                , button [ onClick (AjouterEuros 5), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "5€" ]
-                                , button [ onClick (AjouterEuros 10), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "10€" ]
-                                , button [ onClick (AjouterEuros 20), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "20€" ]
-                                , button [ onClick (AjouterEuros 50), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-3 rounded-xl text-lg" ] [ text "50€" ]
+                                [ button [ onClick (AjouterEuros 1), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "1€" ]
+                                , button [ onClick (AjouterEuros 2), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "2€" ]
+                                , button [ onClick (AjouterEuros 5), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "5€" ]
+                                , button [ onClick (AjouterEuros 10), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "10€" ]
+                                , button [ onClick (AjouterEuros 20), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "20€" ]
+                                , button [ onClick (AjouterEuros 50), class "bg-green-100 hover:bg-green-200 text-green-800 font-bold p-4 rounded-xl text-xl" ] [ text "50€" ]
                                 ]
                             ]
                         , div []
@@ -598,14 +598,14 @@ view model =
                             [ div [ class "flex gap-2" ]
                                 [ button
                                     [ onClick AnnulerSaisie
-                                    , class "flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold p-4 rounded-xl text-lg border-2 border-gray-200 active:scale-95 transition-all outline-none"
+                                    , class "flex-1 bg-white text-gray-500 hover:bg-gray-100 font-bold p-5 rounded-2xl text-xl border-2 border-gray-200 active:scale-95 transition-all outline-none"
                                     ]
                                     [ text "Annuler" ]
                                 ]
                             , div [ class "flex gap-2" ]
                                 [ button
                                     [ onClick ValiderVenteEspece
-                                    , class "flex-1 bg-green-500 hover:bg-green-600 text-white font-bold p-4 rounded-xl text-lg shadow-lg active:scale-95 transition-all outline-none"
+                                    , class "flex-1 bg-green-500 hover:bg-green-600 text-white font-bold p-5 rounded-2xl text-xl shadow-lg active:scale-95 transition-all outline-none"
                                     ]
                                     [ text "Espèces" ]
                                 , button
@@ -613,9 +613,9 @@ view model =
                                     , Html.Attributes.disabled (state.eurosRecusEnCours > 0)
                                     , class
                                         (if state.eurosRecusEnCours > 0 then
-                                            "flex-1 bg-gray-300 text-gray-500 cursor-not-allowed font-bold p-4 rounded-xl text-lg shadow-none transition-all outline-none"
+                                            "flex-1 bg-gray-300 text-gray-500 cursor-not-allowed font-bold p-5 rounded-2xl text-xl shadow-none transition-all outline-none"
                                          else
-                                            "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-4 rounded-xl text-lg shadow-lg active:scale-95 transition-all outline-none"
+                                            "flex-1 bg-primary hover:bg-primaryDark text-white font-bold p-5 rounded-2xl text-xl shadow-lg active:scale-95 transition-all outline-none"
                                         )
                                     ]
                                     [ text "CB" ]
